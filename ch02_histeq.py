@@ -26,4 +26,3 @@ title('equalized hist')
 hist(im2.flatten(), 128, normed=True)
 
 show()
-

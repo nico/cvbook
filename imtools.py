@@ -23,3 +23,17 @@ def histeq(im, bin_count=256):
 
   im2 = numpy.interp(im.flatten(), bins[:-1], cdf)
   return im2.reshape(im.shape), cdf
+
+
+def compute_average(imlist):
+  """Compute the average of a lsit of images."""
+  avg = numpy.array(Image.open(imlist[0]), 'f')
+  count = 1
+  for name in imlist[1:]:
+    try:
+      avg += numpy.array(Image.open(name))
+      count += 1
+    except:
+      print name + '...skipped'
+  avg /= count
+  return numpy.array(avg, 'uint8')
