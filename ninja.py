@@ -22,7 +22,7 @@ n.variable('cflags', '-fcolor-diagnostics -arch i386 -arch x86_64')
 
 outs = []
 for f in glob.glob('zlib-1.2.8/*.c'):
-  outs.append('ninjaout/' + f + '.o')
+  outs.append('ninjaout/' + os.path.splitext(f)[0] + '.o')
   n.build(outs[-1], 'cc', inputs=f)
 n.build('ninjaout/libz.a', 'arlink', inputs=outs)
 
@@ -31,13 +31,6 @@ outs = []
 for f in glob.glob('jpeg-6b/j*.c'):
   if 'jpegtran' in f or (
      'jmem' in f and not 'jmemmgr' in f and not 'jmemnobs' in f): continue
-  outs.append('ninjaout/' + f + '.o')
+  outs.append('ninjaout/' + os.path.splitext(f)[0] + '.o')
   n.build(outs[-1], 'cc', inputs=f)
 n.build('ninjaout/libjpeg.a', 'arlink', inputs=outs)
-
-
-#outs = []
-#for f in glob.glob('libImaging/*.c'):
-  #outs.append('ninjaout/' + f + '.o')
-  #n.build(outs[-1], 'cc', inputs=f)
-#n.build('ninjaout/libjpeg.a', 'arlink', inputs=outs)
