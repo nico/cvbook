@@ -6,7 +6,7 @@ import rof
 im = misc.lena()
 #im = im + 20 * numpy.random.standard_normal(im.shape)
 
-U, T = rof.denoise(im, im, tv_weight=30)
+U, T = rof.denoise(im, im, tv_weight=30, tolerance=0.01)
 
 gray()
 subplot(1, 2, 1)

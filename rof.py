@@ -1,7 +1,10 @@
 import numpy
 
-def denoise(im, U_init, tolerance=0.1, tau=0.125, tv_weight=100):
-  """Denoises |im| using the ROF image denoising model."""
+def denoise(im, U_init, tolerance=0.1, tau=0.125, tv_weight=30):
+  """Denoises |im| using the ROF image denoising model.
+  
+  Note: If tv_weight is set to something large, tolerance needs to be
+  lowered."""
   # THe code is from Jan Erik Solem's book; it's based on:
   # Chambolle 2005, eq 11 on p14 "Total variation minimization and a class of
   # binary MRF models"
