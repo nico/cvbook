@@ -48,7 +48,10 @@ def match(desc1, desc2):
   for i in range(desc1_size[0]):
     dotprods = numpy.dot(desc1[i, :], desc2t)
     dotprods = 0.9999 * dotprods
-    indx = numpy.argsort(numpy.arccos(dotprods))
+
+    # arccos is monotonous, can sort on just its sign.
+    #indx = numpy.argsort(numpy.arccos(dotprods))
+    indx = numpy.argsort(-dotprods)
 
     if (numpy.arccos(dotprods)[indx[0]] <
         dist_ratio * numpy.arccos(dotprods)[indx[1]]):
