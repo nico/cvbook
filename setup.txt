@@ -28,3 +28,11 @@ Build PIL:
     python setup.py build
     sudo python setup.py install
 
+
+vlfeat:
+
+Grab binaries from http://www.vlfeat.org/ , add them to PATH
+
+pydot:
+
+    sudo easy_install pydot
