@@ -1,8 +1,10 @@
 from PIL import Image
 from pylab import *
 import harris
+import imtools
 
 im = array(Image.open('board.jpeg').convert('L'))
+#im, _ = imtools.histeq(im)
 harrisim = harris.compute_harris_response(im)
 figure()
 gray()
