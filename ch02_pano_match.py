@@ -41,14 +41,14 @@ for i in range(image_count):
     # Note: pydot needs absolute paths for the image= parameter.
 
     im = Image.open(imlist[i])
-    im.thumbnail((100, 100))
+    im.thumbnail((300, 300))
     filename = 'out_pano_{}.png'.format(i)
     im.save(filename)
     g.add_node(pydot.Node(str(i), fontcolor='transparent',
       shape='rectangle', image=os.path.abspath(filename)))
 
     im = Image.open(imlist[j])
-    im.thumbnail((100, 100))
+    im.thumbnail((300, 300))
     filename = 'out_pano_{}.png'.format(j)
     im.save(filename)
     g.add_node(pydot.Node(str(j), fontcolor='transparent',
