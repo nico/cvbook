@@ -4,10 +4,16 @@ import json
 
 URL = 'http://www.panoramio.com/map/get_panoramas.php?' \
       'order=popularity&set=public&size=medium&' \
-      'from=0&to={n}&minx={minx}&miny={miny}&maxx={maxx}&maxy={maxy}'
+      'from=20&to={n}&minx={minx}&miny={miny}&maxx={maxx}&maxy={maxy}'
 
+# Santa cruz lighthouse: x=-122.026618 y=36.951614
+# White house: x=-77.038564 y=38.897662
+
+x = -122.026618
+y = 36.951614
+d = 0.001
 url = URL.format(
-    n=20, minx=-77.037564, miny=38.896662, maxx=-77.035564, maxy=38.898662)
+    n=40, minx=x - d, miny=y - d, maxx=x + d, maxy=y + d)
 
 j = json.loads(urllib.urlopen(url).read())
 imurls = [im['photo_file_url'] for im in j['photos']]

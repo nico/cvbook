@@ -55,4 +55,4 @@ for i in range(image_count):
       shape='rectangle', image=os.path.abspath(filename)))
 
     g.add_edge(pydot.Edge(str(i), str(j)))
-g.write_png('out_whitehouse.png')
+g.write_png('out_lighthouse.png')
