@@ -12,7 +12,10 @@ def make_homog(points):
 
 
 def H_from_points(fp, tp):
-  '''Find H such that H * fp = tp'''
+  '''Find H such that H * fp = tp.
+  
+  H has eight degrees of freedom, so this needs at least 4 points in fp and tp.
+  '''
   if fp.shape != tp.shape:
     raise RuntimeError('number of points do not match')
 
@@ -43,6 +46,48 @@ def H_from_points(fp, tp):
 
   U, S, V = numpy.linalg.svd(A)
   H = V[8].reshape((3, 3))
+
+  # decondition
+  H = numpy.dot(numpy.linalg.inv(C2), numpy.dot(H, C1))
+  return H / H[2, 2]
+
+
+def Haffine_from_points(fp, tp):
+  '''Find affine H such that H * fp = tp.
+  
+  H has six degrees of freedom, so this needs at least 3 points in fp and tp.
+  '''
+  if fp.shape != tp.shape:
+    raise RuntimeError('number of points do not match')
+
+  # condition:
+  # -from
+  m = numpy.mean(fp[:2], axis=1)
+  maxstd = numpy.max(numpy.std(fp[:2], axis=1)) + 1e-9
+  C1 = numpy.diag([1/maxstd, 1/maxstd, 1])
+  C1[0, 2] = -m[0] / maxstd
+  C1[1, 2] = -m[1] / maxstd
+  fp_cond = numpy.dot(C1, fp)
+
+  # -to
+  m = numpy.mean(tp[:2], axis=1)
+  maxstd = numpy.max(numpy.std(tp[:2], axis=1)) + 1e-9
+  C2 = numpy.diag([1/maxstd, 1/maxstd, 1])
+  C2[0, 2] = -m[0] / maxstd
+  C2[1, 2] = -m[1] / maxstd
+  tp_cond = numpy.dot(C2, tp)
+
+  A = numpy.concatenate((fp_cond[:2], tp_cond[:2]), axis=0)
+  U, S, V = numpy.linalg.svd(A.T)
+
+  tmp = V[:2].T
+  B = tmp[:2]
+  C = tmp[2:4]
+
+  tmp2 = numpy.concatenate((numpy.dot(C, numpy.linalg.pinv(B)),
+                            numpy.zeros((2, 1))),
+                           axis=1)
+  H = numpy.vstack((tmp2, [0, 0, 1]))
 
   # decondition
   H = numpy.dot(numpy.linalg.inv(C2), numpy.dot(H, C1))
