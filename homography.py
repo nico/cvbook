@@ -92,3 +92,35 @@ def Haffine_from_points(fp, tp):
   # decondition
   H = numpy.dot(numpy.linalg.inv(C2), numpy.dot(H, C1))
   return H / H[2, 2]
+
+
+class RansacModel(object):
+  def __init(self, debug=False):
+    self.debug = debug
+
+  def fit(self, data):
+    data = data.T  # for H_from_points()
+    fp = data[:3, :4]
+    tp = data[3:, :4]
+    return H_from_points(fp, tp)
+
+  def get_error(self, data, H):
+    data = data.T
+    fp = data[:3]
+    tp = data[3:]
+
+    fp_transformed = numpy.dot(H, fp)
+
+    #for i in range(3):
+      #fp_transformed[i] /= fp_transformed[2]  # XXX not 3?
+    normalize(fp_transformed)  # XXX
+
+    return numpy.sqrt(numpy.sum((tp - fp_transformed) ** 2, axis=0))
+
+
+def H_from_ransac(fp, tp, model, maxiter=1000, match_threshold=10):
+  import ransac
+  data = numpy.vstack((fp, tp))
+  H, ransac_data = ransac.ransac(data.T, model, 4, maxiter, match_threshold, 10,
+                                 return_all=True)
+  return H, ransac_data['inliers']
