@@ -22,6 +22,15 @@ for i in range(len(imname)):
     sift.process_image(imname[i], siftname[i])
   l[i], d[i] = sift.read_features_from_file(siftname[i])
 
+  # Only use features from the top of the image:
+  #bettera, betterb = [], []
+  #for j in range(len(l[i])):
+  #  if l[i][j][1] < 900:
+  #    bettera.append(l[i][j])
+  #    betterb.append(d[i][j])
+  #l[i] = array(bettera)
+  #d[i] = array(betterb)
+
 tic.k('loaded')
 
 matches = [sift.match(d[1], d[0])]
