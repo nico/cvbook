@@ -15,6 +15,14 @@ def imresize(im, sz):
   return numpy.array(pil_im.resize(sz))
 
 
+def Htransform(im, H, out_size):
+  """Applies a homography transform to im"""
+  pil_im = Image.fromarray(im)
+  pil_size = out_size[1], out_size[0]
+  return numpy.array(pil_im.transform(
+    pil_size, Image.PERSPECTIVE, H.reshape(9)[0:8] / H[2,2], Image.LINEAR))
+
+
 def histeq(im, bin_count=256):
   """Histogram equalization of a grayscale image."""
   imhist, bins = numpy.histogram(im.flatten(), bin_count, normed=True)

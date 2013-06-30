@@ -36,10 +36,11 @@ H_12 = homography.H_from_ransac(fp, tp, model)[0]
 # ...
 
 delta = 600
-im1 = array(Image.open(imname[1]).convert('L'))
-im2 = array(Image.open(imname[2]).convert('L'))
+im1 = array(Image.open(imname[1]))#.convert('L'))
+im2 = array(Image.open(imname[2]))#.convert('L'))
 im_12 = warp.panorama(H_12, im1, im2, delta, delta)
 
-gray()
-imshow(im_12)
+if len(im1.shape) == 2:
+  gray()
+imshow(array(im_12, "uint8"))
 show()
