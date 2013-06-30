@@ -35,7 +35,14 @@ import scipy.linalg # use numpy if scipy unavailable
 ## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 def ransac(data,model,n,k,t,d,debug=False,return_all=False):
-    """fit model parameters to data using the RANSAC algorithm"""
+    """fit model parameters to data using the RANSAC algorithm
+    -    data - a set of observed data points
+    -    model - a model that can be fitted to data points
+    -    n - the minimum number of data values required to fit the model
+    -    k - the maximum number of iterations allowed in the algorithm
+    -    t - a threshold value for determining when a data point fits a model
+    -    d - the number of close data values required to assert that a model fits well to data
+    """
     iterations = 0
     bestfit = None
     bestfitness = 0
@@ -45,29 +52,26 @@ def ransac(data,model,n,k,t,d,debug=False,return_all=False):
         maybeinliers = data[maybe_idxs,:]
         test_points = data[test_idxs]
         maybemodel = model.fit(maybeinliers)
-        test_err = model.get_error( test_points, maybemodel)
+        test_err = model.get_error(test_points, maybemodel)
         also_idxs = test_idxs[test_err < t] # select indices of rows with accepted points
-        alsoinliers = data[also_idxs,:]
         if debug:
             print 'test_err.min()',test_err.min()
             print 'test_err.max()',test_err.max()
             print 'numpy.mean(test_err)',numpy.mean(test_err)
-            print 'iteration %d:len(alsoinliers) = %d'%(
-                iterations,len(alsoinliers))
-        if len(alsoinliers) > d:
-            betterdata = numpy.concatenate( (maybeinliers, alsoinliers) )
-            bettermodel = model.fit(betterdata)
-            better_errs = model.get_error( betterdata, bettermodel)
-            thisfitness = len(betterdata)
+            print 'number of inliers',len(also_idxs)
+        if len(also_idxs) > d:
+            thisfitness = len(also_idxs)
             if thisfitness > bestfitness:
                 if debug:
                     print '    new best fit',thisfitness,bestfitness
-                bestfit = bettermodel
                 bestfitness = thisfitness
-                best_inlier_idxs = numpy.concatenate( (maybe_idxs, also_idxs) )
+                best_inlier_idxs = numpy.concatenate((maybe_idxs, also_idxs))
         iterations+=1
-    if bestfit is None:
+
+    if best_inlier_idxs is None:
         raise ValueError("did not meet fit acceptance criteria")
+    bestfit = model.fit(data[best_inlier_idxs,:])
+
     if return_all:
         return bestfit, {'inliers':best_inlier_idxs}
     else:
@@ -142,7 +146,7 @@ def test():
 
     # run RANSAC algorithm
     ransac_fit, ransac_data = ransac(all_data,model,
-                                     50, 1000, 7e3, 300, # misc. parameters
+                                     2, 1000, 7e3, 300, # misc. parameters
                                      debug=debug,return_all=True)
     if 1:
         import pylab
