@@ -66,4 +66,25 @@ tic.k('warpd')
 if len(im1.shape) == 2:
   gray()
 imshow(array(im_12, "uint8"))
+
+if False:
+  # Overlay raw feature locations.
+  is_left = H_12[0, 2] < 0
+  pdelta = delta if not is_left else 0
+  def draw_circle(c, r, col):
+    t = arange(0, 1.01, .01) * 2 * pi
+    x = r * cos(t) + c[0]
+    y = r * sin(t) + c[1]
+    plot(x, y, col, linewidth=2)
+  for p in l[2]:
+    draw_circle((p[0] + pdelta, p[1]), p[2], 'b')
+  for p in l[1]:
+    hp = array([p[0], p[1], 1])
+    hp = dot(linalg.inv(H_12), hp)
+    hp[0] /= hp[2]
+    hp[1] /= hp[2]
+    hp[0] += pdelta
+    draw_circle(hp, p[2], 'g')
+
+
 show()
