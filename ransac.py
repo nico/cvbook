@@ -4,7 +4,7 @@ import scipy.linalg # use numpy if scipy unavailable
 
 ## Copyright (c) 2004-2007, Andrew D. Straw. All rights reserved.
 ## Copyright (c) 2013, Nico Weber
-## Jun 2013: Changed fitness to be based on size of inliers set.
+## Jun 2013: Changed to true classical ransac and optional msac.
 
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are
@@ -34,7 +34,7 @@ import scipy.linalg # use numpy if scipy unavailable
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-def ransac(data,model,n,k,t,d,debug=False,return_all=False):
+def ransac(data,model,n,k,t,d,debug=False,return_all=False,msac=True):
     """fit model parameters to data using the RANSAC algorithm
     -    data - a set of observed data points
     -    model - a model that can be fitted to data points
@@ -45,7 +45,7 @@ def ransac(data,model,n,k,t,d,debug=False,return_all=False):
     """
     iterations = 0
     bestfit = None
-    bestfitness = 0
+    bestfitness = numpy.infty
     best_inlier_idxs = None
     while iterations < k:
         maybe_idxs, test_idxs = random_partition(n,data.shape[0])
@@ -60,8 +60,10 @@ def ransac(data,model,n,k,t,d,debug=False,return_all=False):
             print 'numpy.mean(test_err)',numpy.mean(test_err)
             print 'number of inliers',len(also_idxs)
         if len(also_idxs) > d:
-            thisfitness = len(also_idxs)
-            if thisfitness > bestfitness:
+            thisfitness = (data.shape[0] - n - len(also_idxs)) * t
+            if msac:
+                thisfitness += numpy.sum(test_err[test_err < t])
+            if thisfitness < bestfitness:
                 if debug:
                     print '    new best fit',thisfitness,bestfitness
                 bestfitness = thisfitness
