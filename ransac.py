@@ -45,28 +45,28 @@ def ransac(data,model,n,k,t,d,debug=False,return_all=False,msac=True):
     """
     iterations = 0
     bestfit = None
-    bestfitness = numpy.infty
+    bestcost = numpy.infty
     best_inlier_idxs = None
     while iterations < k:
-        maybe_idxs, test_idxs = random_partition(n,data.shape[0])
-        maybeinliers = data[maybe_idxs,:]
+        maybe_idxs, test_idxs = random_partition(n, data.shape[0])
+        maybeinliers = data[maybe_idxs, :]
         test_points = data[test_idxs]
         maybemodel = model.fit(maybeinliers)
         test_err = model.get_error(test_points, maybemodel)
         also_idxs = test_idxs[test_err < t] # select indices of rows with accepted points
         if debug:
-            print 'test_err.min()',test_err.min()
-            print 'test_err.max()',test_err.max()
-            print 'numpy.mean(test_err)',numpy.mean(test_err)
-            print 'number of inliers',len(also_idxs)
+            print 'test_err.min()', test_err.min()
+            print 'test_err.max()', test_err.max()
+            print 'numpy.mean(test_err)', numpy.mean(test_err)
+            print 'number of inliers', len(also_idxs)
         if len(also_idxs) > d:
-            thisfitness = (data.shape[0] - n - len(also_idxs)) * t
+            thiscost = (data.shape[0] - n - len(also_idxs)) * t
             if msac:
-                thisfitness += numpy.sum(test_err[test_err < t])
-            if thisfitness < bestfitness:
+                thiscost += numpy.sum(test_err[test_err < t])
+            if thiscost < bestcost:
                 if debug:
-                    print '    new best fit',thisfitness,bestfitness
-                bestfitness = thisfitness
+                    print '    new best fit',thiscost,bestcost
+                bestcost = thiscost
                 best_inlier_idxs = numpy.concatenate((maybe_idxs, also_idxs))
         iterations+=1
 
