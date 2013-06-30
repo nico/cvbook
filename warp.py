@@ -22,8 +22,10 @@ def panorama(H, fromim, toim, padding=2400, delta=2400):
   is_color = len(fromim.shape) == 3
 
   def transf(p):
-    p2 = numpy.dot(H, [p[0], p[1], 1])
-    return p2[0] / p2[2], p2[1] / p2[2]
+    # ndimage passes y in p[0] and x in p[1], so swap to multiply with H and
+    # then swap back.
+    p2 = numpy.dot(H, [p[1], p[0], 1])
+    return p2[1] / p2[2], p2[0] / p2[2]
 
   if H[1, 2] < 0:  # fromim is on the right
     print 'warp right'
@@ -42,7 +44,7 @@ def panorama(H, fromim, toim, padding=2400, delta=2400):
           fromim, transf, (toim.shape[0], toim.shape[1] + padding), order=0)
   else:
     print 'warp left'
-    H_delta = numpy.array([[1, 0, 0], [0, 1, -delta], [0, 0, 1]])
+    H_delta = numpy.array([[1, 0, -delta], [0, 1, 0], [0, 0, 1]])
     H = numpy.dot(H, H_delta)
 
     if is_color:

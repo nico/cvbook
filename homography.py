@@ -95,9 +95,6 @@ def Haffine_from_points(fp, tp):
 
 
 class RansacModel(object):
-  def __init(self, debug=False):
-    self.debug = debug
-
   def fit(self, data):
     data = data.T  # for H_from_points()
     fp = data[:3, :4]
@@ -110,10 +107,7 @@ class RansacModel(object):
     tp = data[3:]
 
     fp_transformed = numpy.dot(H, fp)
-
-    #for i in range(3):
-      #fp_transformed[i] /= fp_transformed[2]  # XXX not 3?
-    normalize(fp_transformed)  # XXX
+    normalize(fp_transformed)
 
     return numpy.sqrt(numpy.sum((tp - fp_transformed) ** 2, axis=0))
 
