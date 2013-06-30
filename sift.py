@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy
 import os
+import scipy.io as sio
 
 def process_image(imagename, resultname,
                   params='--edge-thresh 10 --peak-thresh 5'):
@@ -13,10 +14,14 @@ def process_image(imagename, resultname,
   cmd = ' '.join(['sift', imagename, '--output=' + resultname, params])
   os.system(cmd)
 
+  # Re-write as .mat file, which loads faster.
+  f = numpy.loadtxt(resultname)
+  sio.savemat(resultname + '.mat', {'f':f}, oned_as='row')
+
 
 def read_features_from_file(filename):
   '''Returns feature locations, descriptors.'''
-  f = numpy.loadtxt(filename)
+  f = sio.loadmat(filename + '.mat')['f']
   return f[:, :4], f[:, 4:]
 
 
