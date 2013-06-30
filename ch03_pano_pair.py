@@ -22,17 +22,9 @@ for i in range(len(imname)):
     sift.process_image(imname[i], siftname[i])
   l[i], d[i] = sift.read_features_from_file(siftname[i])
 
-
 tic.k('loaded')
 
-matches = {}
-if not os.path.exists('out_ch03_pano_pair.pickle'):
-  for i in range(len(imname) - 1):
-    matches[i] = sift.match(d[i + 1], d[i])
-    # Slightly better matches, but ransac can handle the worse quality:
-    #matches[i] = sift.match_twosided(d[i + 1], d[i])
-  pickle.dump(matches, open('out_ch03_pano.pickle', 'wb'))
-matches = pickle.load(open('out_ch03_pano.pickle', 'rb'))
+matches = [sift.match(d[1], d[0])]
 
 tic.k('matched')
 
