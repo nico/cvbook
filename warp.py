@@ -34,8 +34,7 @@ def panorama(H, fromim, toim, padding=2400, delta=2400):
     H = numpy.dot(H, H_delta)
     toim_t = numpy.hstack((toim_zeros, toim))
 
-  fromim_t = imtools.Htransform(
-      fromim, H, (toim.shape[0], toim.shape[1] + padding))
+  fromim_t = imtools.Htransform(fromim, H, (toim_t.shape[0], toim_t.shape[1]))
 
   if is_color:
     # Three separate checks instead of a * b * c > 0 because of uint8 overflow.
