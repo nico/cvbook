@@ -1,10 +1,15 @@
 from PIL import Image
 from pylab import *
+import sys
+
 import sift
 import imtools
 
-im1f = '/Users/thakis/src/PCV/data/sf_view1.jpg'
-im2f = '/Users/thakis/src/PCV/data/sf_view2.jpg'
+if len(sys.argv) >= 3:
+  im1f, im2f = sys.argv[1], sys.argv[2]
+else:
+  im1f = '/Users/thakis/src/PCV/data/sf_view1.jpg'
+  im2f = '/Users/thakis/src/PCV/data/sf_view2.jpg'
 im1 = array(Image.open(im1f).convert('L'))
 im2 = array(Image.open(im2f).convert('L'))
 
