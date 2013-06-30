@@ -10,7 +10,7 @@ import tic
 import warp
 
 
-imname = glob.glob('out_Photos/IMG_*.jpg')
+imname = glob.glob('out_Photos/IMG_*.jpg')[1:3]
 siftname = [os.path.splitext(im)[0] + '.sift' for im in imname]
 
 tic.k('start')
@@ -26,7 +26,7 @@ for i in range(len(imname)):
 tic.k('loaded')
 
 matches = {}
-if not os.path.exists('out_ch03_pano.pickle'):
+if not os.path.exists('out_ch03_pano_pair.pickle'):
   for i in range(len(imname) - 1):
     matches[i] = sift.match(d[i + 1], d[i])
     # Slightly better matches, but ransac can handle the worse quality:
@@ -45,7 +45,7 @@ def convert_points(j):
 
 model = homography.RansacModel()
 
-fp, tp = convert_points(1)
+fp, tp = convert_points(0)
 
 tic.k('converted')
 
@@ -56,8 +56,8 @@ tic.k('homogd')
 # ...
 
 delta = 600
-im1 = array(Image.open(imname[1]))#.convert('L'))
-im2 = array(Image.open(imname[2]))#.convert('L'))
+im1 = array(Image.open(imname[0]))#.convert('L'))
+im2 = array(Image.open(imname[1]))#.convert('L'))
 
 tic.k('imloaded')
 
@@ -78,9 +78,9 @@ if False:
     x = r * cos(t) + c[0]
     y = r * sin(t) + c[1]
     plot(x, y, col, linewidth=2)
-  for p in l[2]:
-    draw_circle((p[0] + pdelta, p[1]), p[2], 'b')
   for p in l[1]:
+    draw_circle((p[0] + pdelta, p[1]), p[2], 'b')
+  for p in l[0]:
     hp = array([p[0], p[1], 1])
     # fp are the points in im2, tp the points in im1, so H_12 maps
     # from im2 space to im1 space. Invert to go from im1 to im2.
@@ -92,14 +92,14 @@ if False:
 
 if True:
   # Overlay matches.
-  for i, m in enumerate(matches[1]):
+  for i, m in enumerate(matches[0]):
     if m > 0:
-      tp = array([l[1][m, 0], l[1][m, 1], 1])
+      tp = array([l[0][m, 0], l[0][m, 1], 1])
       tp_ = dot(linalg.inv(H_12), tp)
       tp_[0] /= tp_[2]
       tp_[1] /= tp_[2]
       #tp_[2] /= tp_[2]
-      fp = array([l[2][i, 0], l[2][i, 1], 1])
+      fp = array([l[1][i, 0], l[1][i, 1], 1])
       plot([tp_[0] + pdelta, fp[0] + pdelta], [tp_[1], fp[1]], 'c')
 
 

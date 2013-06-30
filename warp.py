@@ -18,7 +18,7 @@ def image_in_image(im1, im2, tp):
   return (1 - alpha) * im2 + alpha * im1_t
 
 
-def panorama(H, fromim, toim, padding=2400, delta=2400):
+def panorama(H, fromim, toim, padding=2400, delta=2400, alpha=1):
   import imtools
 
   is_color = len(fromim.shape) == 3
@@ -40,12 +40,12 @@ def panorama(H, fromim, toim, padding=2400, delta=2400):
     # Three separate checks instead of a * b * c > 0 because of uint8 overflow.
     alpha = ((fromim_t[:, :, 0] > 0) *
              (fromim_t[:, :, 1] > 0) *
-             (fromim_t[:, :, 2] > 0)) * 0.5 # XXX
+             (fromim_t[:, :, 2] > 0)) * alpha
     for col in range(3):
       toim_t[:, :, col] = fromim_t[:, :, col] * alpha + \
                           toim_t[:, :, col]   * (1 - alpha)
   else:
-    alpha = (fromim_t > 0) * 0.5 # XXX
+    alpha = (fromim_t > 0) * alpha
     toim_t = fromim_t * alpha + toim_t * (1 - alpha)
 
   return toim_t
