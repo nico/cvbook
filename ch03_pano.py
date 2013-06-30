@@ -46,61 +46,44 @@ def convert_points(j):
 model = homography.RansacModel()
 
 fp, tp = convert_points(1)
-
-tic.k('converted')
-
 H_12 = homography.H_from_ransac(fp, tp, model)[0]
+tic.k('12 homogd')
 
-tic.k('homogd')
+fp, tp = convert_points(0)
+H_01 = homography.H_from_ransac(fp, tp, model)[0]
+tic.k('01 homogd')
 
-# ...
+tp, fp = convert_points(2)  # Note: Reversed.
+H_32 = homography.H_from_ransac(fp, tp, model)[0]
+tic.k('32 homogd')
+
+tp, fp = convert_points(3)  # Note: Reversed.
+H_43 = homography.H_from_ransac(fp, tp, model)[0]
+tic.k('43 homogd')
 
 delta = 600
-im1 = array(Image.open(imname[1]))#.convert('L'))
-im2 = array(Image.open(imname[2]))#.convert('L'))
+H_delta2 = array([[1, 0, -2*delta], [0, 1, 0], [0, 0, 1]])
 
-tic.k('imloaded')
+im1 = array(Image.open(imname[1]))
+im2 = array(Image.open(imname[2]))
+im_12 = warp.panorama(H_12, im1, im2, delta, delta)
+tic.k('12 warpd')
 
-im_12 = warp.panorama(H_12, im1, im2, delta, delta, alpha=0.5)
+im0 = array(Image.open(imname[0]))
+im_02 = warp.panorama(dot(H_12, H_01), im0, im_12, delta, 2*delta)
+tic.k('02 warpd')
 
-tic.k('warpd')
+im3 = array(Image.open(imname[3]))
+# There are two images added on the left already, hence the H_delta2.
+im_03 = warp.panorama(dot(H_32, H_delta2), im3, im_02, delta, 0)
+tic.k('03 warpd')
+
+im4 = array(Image.open(imname[4]))
+im_04 = warp.panorama(dot(dot(H_32, H_43), H_delta2), im4, im_03, delta, 0)
+tic.k('04 warpd')
 
 if len(im1.shape) == 2:
   gray()
-imshow(array(im_12, "uint8"))
-
-is_left = H_12[0, 2] < 0
-pdelta = delta if not is_left else 0
-if False:
-  # Overlay raw feature locations.
-  def draw_circle(c, r, col):
-    t = arange(0, 1.01, .01) * 2 * pi
-    x = r * cos(t) + c[0]
-    y = r * sin(t) + c[1]
-    plot(x, y, col, linewidth=2)
-  for p in l[2]:
-    draw_circle((p[0] + pdelta, p[1]), p[2], 'b')
-  for p in l[1]:
-    hp = array([p[0], p[1], 1])
-    # fp are the points in im2, tp the points in im1, so H_12 maps
-    # from im2 space to im1 space. Invert to go from im1 to im2.
-    hp = dot(linalg.inv(H_12), hp)
-    hp[0] /= hp[2]
-    hp[1] /= hp[2]
-    hp[0] += pdelta
-    draw_circle(hp, p[2], 'g')
-
-if True:
-  # Overlay matches.
-  for i, m in enumerate(matches[1]):
-    if m > 0:
-      tp = array([l[1][m, 0], l[1][m, 1], 1])
-      tp_ = dot(linalg.inv(H_12), tp)
-      tp_[0] /= tp_[2]
-      tp_[1] /= tp_[2]
-      #tp_[2] /= tp_[2]
-      fp = array([l[2][i, 0], l[2][i, 1], 1])
-      plot([tp_[0] + pdelta, fp[0] + pdelta], [tp_[1], fp[1]], 'c')
-
+imshow(array(im_04, "uint8"))
 
 show()
