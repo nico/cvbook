@@ -10,7 +10,7 @@ import tic
 import warp
 
 
-imname = glob.glob('out_Photos/IMG_*.jpg')[1:3]
+imname = glob.glob('out_Photos/IMG_*.jpg')[3:5]
 siftname = [os.path.splitext(im)[0] + '.sift' for im in imname]
 
 tic.k('start')
@@ -48,8 +48,8 @@ tic.k('homogd')
 # ...
 
 delta = 600
-im1 = array(Image.open(imname[0]))#.convert('L'))
-im2 = array(Image.open(imname[1]))#.convert('L'))
+im1 = array(Image.open(imname[0]).convert('L'))
+im2 = array(Image.open(imname[1]).convert('L'))
 
 tic.k('imloaded')
 

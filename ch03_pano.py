@@ -61,6 +61,8 @@ tp, fp = convert_points(3)  # Note: Reversed.
 H_43 = homography.H_from_ransac(fp, tp, model)[0]
 tic.k('43 homogd')
 
+# FIXME: Consider using bundle adjustment and Levenberg-Marquardt instead of
+# just concatenating homographies which accumulates errors.
 delta = 600
 H_delta2 = array([[1, 0, -2*delta], [0, 1, 0], [0, 0, 1]])
 
