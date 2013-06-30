@@ -80,6 +80,8 @@ if False:
     draw_circle((p[0] + pdelta, p[1]), p[2], 'b')
   for p in l[1]:
     hp = array([p[0], p[1], 1])
+    # fp are the points in im2, tp the points in im1, so H_12 maps
+    # from im2 space to im1 space. Invert to go from im1 to im2.
     hp = dot(linalg.inv(H_12), hp)
     hp[0] /= hp[2]
     hp[1] /= hp[2]
