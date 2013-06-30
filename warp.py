@@ -22,42 +22,26 @@ def panorama(H, fromim, toim, padding=2400, delta=2400):
   import imtools
 
   is_color = len(fromim.shape) == 3
-
-  def transf(p):
-    # ndimage passes y in p[0] and x in p[1], so swap to multiply with H and
-    # then swap back.
-    p2 = numpy.dot(H, [p[1], p[0], 1])
-    return p2[1] / p2[2], p2[0] / p2[2]
+  if is_color:
+    toim_zeros = numpy.zeros((toim.shape[0], padding, 3))
+  else:
+    toim_zeros = numpy.zeros((toim.shape[0], padding))
 
   if H[0, 2] < 0:  # fromim is on the right
-    print 'warp right'
-    if is_color:
-      toim_t = numpy.hstack((toim, numpy.zeros((toim.shape[0], padding, 3))))
-      fromim_t = imtools.Htransform(
-          fromim, H, (toim.shape[0], toim.shape[1] + padding))
-    else:
-      toim_t = numpy.hstack((toim, numpy.zeros((toim.shape[0], padding))))
-      fromim_t = imtools.Htransform(
-          fromim, H, (toim.shape[0], toim.shape[1] + padding))
+    toim_t = numpy.hstack((toim, toim_zeros))
   else:
-    print 'warp left'
     H_delta = numpy.array([[1, 0, -delta], [0, 1, 0], [0, 0, 1]])
     H = numpy.dot(H, H_delta)
+    toim_t = numpy.hstack((toim_zeros, toim))
 
-    if is_color:
-      toim_t = numpy.hstack((numpy.zeros((toim.shape[0], padding, 3)), toim))
-      fromim_t = imtools.Htransform(
-          fromim, H, (toim.shape[0], toim.shape[1] + padding))
-    else:
-      toim_t = numpy.hstack((numpy.zeros((toim.shape[0], padding)), toim))
-      fromim_t = imtools.Htransform(
-          fromim, H, (toim.shape[0], toim.shape[1] + padding))
+  fromim_t = imtools.Htransform(
+      fromim, H, (toim.shape[0], toim.shape[1] + padding))
 
   if is_color:
     # Three separate checks instead of a * b * c > 0 because of uint8 overflow.
     alpha = ((fromim_t[:, :, 0] > 0) *
              (fromim_t[:, :, 1] > 0) *
-             (fromim_t[:, :, 2] > 0))
+             (fromim_t[:, :, 2] > 0)) * 0.5 # XXX
     for col in range(3):
       toim_t[:, :, col] = fromim_t[:, :, col] * alpha + \
                           toim_t[:, :, col]   * (1 - alpha)
