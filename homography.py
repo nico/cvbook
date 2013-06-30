@@ -97,8 +97,8 @@ def Haffine_from_points(fp, tp):
 class RansacModel(object):
   def fit(self, data):
     data = data.T  # for H_from_points()
-    fp = data[:3, :4]
-    tp = data[3:, :4]
+    fp = data[:3]
+    tp = data[3:]
     return H_from_points(fp, tp)
 
   def get_error(self, data, H):
