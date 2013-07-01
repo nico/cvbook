@@ -10,7 +10,7 @@ import tic
 import warp
 
 
-imname = glob.glob('out_Photos/IMG_*.jpg')[3:5]
+imname = glob.glob('out_Photos/IMG_*.jpg')[1:3]
 siftname = [os.path.splitext(im)[0] + '.sift' for im in imname]
 
 tic.k('start')
@@ -34,6 +34,7 @@ for i in range(len(imname)):
 tic.k('loaded')
 
 matches = [sift.match(d[1], d[0])]
+#matches = [sift.match_twosided(d[1], d[0])]  # Not needed with ransac.
 
 tic.k('matched')
 
@@ -50,7 +51,12 @@ fp, tp = convert_points(0)
 
 tic.k('converted')
 
-H_12 = homography.H_from_ransac(fp, tp, model)[0]
+if True:
+  # Ignore wrong matches.
+  H_12 = homography.H_from_ransac(fp, tp, model)[0]
+else:
+  # Assume all matches are correct.
+  H_12 = homography.H_from_points(fp, tp)
 
 tic.k('homogd')
 
