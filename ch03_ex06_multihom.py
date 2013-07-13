@@ -34,34 +34,36 @@ fp = homography.make_homog(l[1][ndx, :2].T)
 ndx2 = [int(matches[i]) for i in ndx]
 tp = homography.make_homog(l[0][ndx2, :2].T)
 
+
 tic.k('converted')
-
-model = homography.RansacModel()
-
-H1, inliers1 = homography.H_from_ransac(fp, tp, model)
-
-tic.k('h1 computed')
-
-# Remove inliers from first round, rerun ransac.
-fp2 = numpy.delete(fp, inliers1, axis=1)
-tp2 = numpy.delete(tp, inliers1, axis=1)
-H2, inliers2 = homography.H_from_ransac(fp2, tp2, model)
-
-tic.k('h2 computed')
-
 
 im1 = array(Image.open(imname[0]).convert('L'))
 im2 = array(Image.open(imname[1]).convert('L'))
-
-tic.k('imloaded')
-
 if len(im1.shape) == 2:
   gray()
 imshow(im1)
-inliers1_pts = tp[:2, inliers1]
-plot(inliers1_pts[0], inliers1_pts[1], 'gx')
 
-inliers2_pts = tp2[:2, inliers2]
-plot(inliers2_pts[0], inliers2_pts[1], 'rx')
+tic.k('imloaded')
+
+model = homography.RansacModel()
+
+colors = ['rx', 'gx', 'bx']
+i = 0
+# The ransac in H_from_ransac needs 4 model points and at least 10 additional
+# inliers.
+while fp.shape[1] >= 14:
+  H, inliers = homography.H_from_ransac(fp, tp, model)
+
+  inliers_pts = tp[:2, inliers]
+  plot(inliers_pts[0], inliers_pts[1], colors[i])
+
+  fp = numpy.delete(fp, inliers, axis=1)
+  tp = numpy.delete(tp, inliers, axis=1)
+  i += 1
+
+# Plot remaining matches.
+plot(tp[0], tp[1], 'yx')
+
+tic.k('sets computed')
 
 show()
