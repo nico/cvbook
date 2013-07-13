@@ -25,6 +25,14 @@ def read_features_from_file(filename):
   return f[:, :4], f[:, 4:]
 
 
+def read_or_compute(imname, siftname):
+  '''Returns features from 'siftname' if it exists. Else, computes features from
+  'imname', writes them to 'siftname', and returns them.'''
+  if not os.path.exists(siftname):
+    process_image(imname, siftname)
+  return read_features_from_file(siftname)
+
+
 def plot_features(im, locs, circle=False):
   import pylab
   def draw_circle(c, r):

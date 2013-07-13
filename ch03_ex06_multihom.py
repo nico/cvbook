@@ -11,9 +11,6 @@ tic.k('start')
 
 l, d = {}, {}
 for i in range(len(imname)):
-  if not os.path.exists(siftname[i]):
-    print 'sifting'
-    sift.process_image(imname[i], siftname[i])
-  l[i], d[i] = sift.read_features_from_file(siftname[i])
+  l[i], d[i] = sift.read_or_compute(imname[i], siftname[i])
 
 tic.k('loaded sifts')
