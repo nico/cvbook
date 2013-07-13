@@ -53,6 +53,7 @@ i = 0
 # inliers.
 while fp.shape[1] >= 14:
   H, inliers = homography.H_from_ransac(fp, tp, model)
+  print 'inlier set size', len(inliers)
 
   inliers_pts = tp[:2, inliers]
   plot(inliers_pts[0], inliers_pts[1], colors[i])
@@ -62,6 +63,7 @@ while fp.shape[1] >= 14:
   i += 1
 
 # Plot remaining matches.
+print 'remaining set size', fp.shape[1]
 plot(tp[0], tp[1], 'yx')
 
 tic.k('sets computed')
