@@ -21,11 +21,10 @@ for i in range(len(imname)):
 
 tic.k('loaded sifts')
 
-
-if not os.path.exists('out_ch03_ex06_match.pickle'):
+if not os.path.exists('out_ch03_ex07_match.pickle'):
   matches = sift.match(d[1], d[0])
-  pickle.dump(matches, open('out_ch03_ex06_match.pickle', 'wb'))
-matches = pickle.load(open('out_ch03_ex06_match.pickle', 'rb'))
+  pickle.dump(matches, open('out_ch03_ex07_match.pickle', 'wb'))
+matches = pickle.load(open('out_ch03_ex07_match.pickle', 'rb'))
 
 tic.k('matched')
 
@@ -33,7 +32,6 @@ ndx = matches.nonzero()[0]
 fp = homography.make_homog(l[1][ndx, :2].T)
 ndx2 = [int(matches[i]) for i in ndx]
 tp = homography.make_homog(l[0][ndx2, :2].T)
-
 
 tic.k('converted')
 
@@ -45,15 +43,15 @@ imshow(im1)
 
 tic.k('imloaded')
 
-model = homography.RansacModel()
+model = homography.AffineRansacModel()
 
 colors = ['rx', 'gx', 'bx']
 i = 0
-# The ransac in H_from_ransac needs 4 model points and at least 10 additional
-# inliers.
-while fp.shape[1] >= 14:
+# The ransac in Haffine_from_ransac needs 3 model points and at least 7
+# additional inliers.
+while fp.shape[1] >= 10:
   try:
-    H, inliers = homography.H_from_ransac(fp, tp, model)
+    H, inliers = homography.Haffine_from_ransac(fp, tp, model)
   except:
     break
   print 'inlier set size', len(inliers)
@@ -72,3 +70,4 @@ plot(tp[0], tp[1], 'yx')
 tic.k('sets computed')
 
 show()
+

@@ -118,3 +118,29 @@ def H_from_ransac(fp, tp, model, maxiter=1000, match_threshold=10):
   H, ransac_data = ransac.ransac(data.T, model, 4, maxiter, match_threshold, 10,
                                  return_all=True)
   return H, ransac_data['inliers']
+
+
+class AffineRansacModel(object):
+  def fit(self, data):
+    data = data.T  # for Haffine_from_points
+    fp = data[:3]
+    tp = data[3:]
+    return Haffine_from_points(fp, tp)
+
+  def get_error(self, data, H):
+    data = data.T
+    fp = data[:3]
+    tp = data[3:]
+
+    fp_transformed = numpy.dot(H, fp)
+    #normalize(fp_transformed)
+
+    return numpy.sqrt(numpy.sum((tp - fp_transformed) ** 2, axis=0))
+
+
+def Haffine_from_ransac(fp, tp, model, maxiter=1000, match_threshold=10):
+  import ransac
+  data = numpy.vstack((fp, tp))
+  H, ransac_data = ransac.ransac(data.T, model, 3, maxiter, match_threshold, 7,
+                                 return_all=True)
+  return H, ransac_data['inliers']
