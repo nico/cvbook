@@ -34,6 +34,14 @@ class Camera(object):
 
     return self.K, self.R, self.t
 
+  def center(self):
+    '''Returns the camera center, the point in space projected to (0, 0) on
+    screen.'''
+    if self.c is None:
+      self.factor()
+      self.c = -numpy.dot(self.R.T, self.t)
+    return self.c
+
 
 def rotation_matrix(a):
   '''Returns a rotation matrix around the axis of a, by an angle that's equal

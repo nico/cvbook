@@ -10,3 +10,4 @@ cam = camera.Camera(numpy.dot(K, Rt))
 
 print K, Rt
 print cam.factor()
+print cam.center()
