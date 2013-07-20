@@ -17,6 +17,24 @@ class Camera(object):
       x[i] /= x[2]
     return x
 
+  def factor(self):
+    '''Factor camera matrix P into K, R, t such that P = K[R|t].'''
+
+    # Factor 3x3 part.
+    K, R = scipy.linalg.rq(self.P[:, :3])
+
+    # Make sure K has a positive determinant.
+    T = numpy.diag(numpy.sign(numpy.diag(K)))
+    if numpy.linalg.det(T) < 0:
+      T[1, 1] *= -1
+
+    self.K = numpy.dot(K, T)
+    self.R = numpy.dot(T, R)  # T is self-inverse
+    self.t = numpy.dot(numpy.linalg.inv(self.K), self.P[:, 3])
+
+    return self.K, self.R, self.t
+
+
 def rotation_matrix(a):
   '''Returns a rotation matrix around the axis of a, by an angle that's equal
   to the length of a in radians.'''
