@@ -36,3 +36,12 @@ Grab binaries from http://www.vlfeat.org/ , add them to PATH
 pydot:
 
     sudo easy_install pydot
+
+
+PyGame:
+
+Grab binaries from http://www.pygame.org/download.shtml
+
+PyOpenGL:
+
+    sudo pip install PyOpenGL PyOpenGL_accelerate
