@@ -46,6 +46,29 @@ def set_modelview_from_camera(Rt):
   glLoadMatrixf(m)
 
 
+def draw_background(imname):
+  bg_image = pygame.image.load(imname).convert()
+  width, height = bg_image.get_size()
+  bg_data = pygame.image.tostring(bg_image, "RGBX", 1)
+
+  glEnable(GL_TEXTURE_2D)
+  tex = glGenTextures(1)
+  glBindTexture(GL_TEXTURE_2D, tex)
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+               GL_RGBA, GL_UNSIGNED_BYTE, bg_data)
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+  glBegin(GL_QUADS)
+  glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+  glTexCoord2f(1, 0); glVertex3f( 1, -1, -1)
+  glTexCoord2f(1, 1); glVertex3f( 1,  1, -1)
+  glTexCoord2f(0, 1); glVertex3f(-1,  1, -1)
+  glEnd()
+
+  glDeleteTextures(tex)
+
+
 def setup():
   pygame.init()
   pygame.display.set_mode((width, height), OPENGL | DOUBLEBUF)
@@ -53,13 +76,15 @@ def setup():
 
 
 setup()
+draw_background('board.jpeg')
 K = numpy.array([[1, 0], [0, 1]])  # FIXME
 set_projection_from_camera(K)
 Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])  # FIXME
 set_modelview_from_camera(Rt)
+pygame.display.flip()
 
 while True:
   event = pygame.event.poll()
   if event.type in (QUIT, KEYDOWN):
     break
-  pygame.display.flip()
+  #pygame.display.flip()
