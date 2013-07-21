@@ -97,6 +97,9 @@ with open('out_ch4_camera.pickle', 'rb') as f:
 
 setup()
 draw_background('out_ch4pics/h_image.jpg')
+
+# FIXME: The origin ends up in a different place than in ch04_markerpose.py
+# somehow.
 set_projection_from_camera(K)
 set_modelview_from_camera(Rt)
 
