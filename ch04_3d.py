@@ -110,8 +110,8 @@ glClear(GL_DEPTH_BUFFER_BIT)
 glMaterialfv(GL_FRONT, GL_AMBIENT, [0, 0, 0, 0])
 glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.5, 0, 0, 0])
 glMaterialfv(GL_FRONT, GL_SHININESS, 0.25 * 128)
-for y in range(0, 3):
-  for x in range(0, 3):
+for y in range(0, 1):
+  for x in range(0, 1):
     glutSolidTeapot(0.02)
     glTranslatef(0.04, 0, 0)
   glTranslatef(-3 * 0.04, 0, 0.04)

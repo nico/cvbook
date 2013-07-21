@@ -45,3 +45,8 @@ Grab binaries from http://www.pygame.org/download.shtml
 PyOpenGL:
 
     sudo pip install PyOpenGL PyOpenGL_accelerate
+
+
+Data files:
+
+merton1 from http://www.robots.ox.ac.uk/~vgg/data/data-mview.html
