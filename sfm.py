@@ -25,3 +25,10 @@ def compute_fundamental(x1, x2):
   S[2] = 0
   F = numpy.dot(U, numpy.dot(numpy.diag(S), V))
   return F
+
+
+def compute_right_epipole(F):
+  '''Returns e with F * e = 0 (call with F.T for left epipole).'''
+  U, S, V = numpy.linalg.svd(F)
+  e = V[-1]  # S is diag([l1, l2, 0]). e's scale is arbitrary.
+  return e / e[2]
