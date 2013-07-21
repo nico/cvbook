@@ -129,5 +129,9 @@ figure()
 imshow(im1)
 plot(box_cam2[0, :], box_cam2[1, :], linewidth=3)
 
+import pickle
+with open('out_ch4_camera.pickle', 'wb') as f:
+  pickle.dump(K, f)
+  pickle.dump(numpy.dot(numpy.linalg.inv(K), cam2.P), f)
 
 show()
