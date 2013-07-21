@@ -4,6 +4,7 @@ from OpenGL.GLUT import *
 import pygame, pygame.image
 from pygame.locals import *
 import numpy
+import pickle
 
 
 width, height = 2592 / 2, 1944 / 2
@@ -36,6 +37,7 @@ def set_modelview_from_camera(Rt):
   R = numpy.dot(U, V)
   R[0, :] = -R[0, :]  # Change sign of x axis.
 
+  print S
   t = Rt[:, 3]
 
   M = numpy.eye(4)
@@ -69,17 +71,6 @@ def draw_background(imname):
   glDeleteTextures(tex)
 
 
-def draw_teapot(size):
-  glEnable(GL_LIGHTING)
-  glEnable(GL_LIGHT0)
-  glEnable(GL_DEPTH_TEST)
-  glClear(GL_DEPTH_BUFFER_BIT)
-  glMaterialfv(GL_FRONT, GL_AMBIENT, [0, 0, 0, 0])
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.5, 0, 0, 0])
-  glMaterialfv(GL_FRONT, GL_SHININESS, 0.25 * 128)
-  glutSolidTeapot(size)
-
-
 def load_and_draw_model(filename):
   glEnable(GL_LIGHTING)
   glEnable(GL_LIGHT0)
@@ -100,13 +91,27 @@ def setup():
   pygame.display.set_caption('Look, an OpenGL window!')
 
 
+with open('out_ch4_camera.pickle', 'rb') as f:
+  K = pickle.load(f)
+  Rt = pickle.load(f)
+
 setup()
 draw_background('out_ch4pics/h_image.jpg')
-K = numpy.array([[width, 0], [0, height]])  # FIXME
 set_projection_from_camera(K)
-Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, -10]])  # FIXME
 set_modelview_from_camera(Rt)
-draw_teapot(2)
+
+glEnable(GL_LIGHTING)
+glEnable(GL_LIGHT0)
+glEnable(GL_DEPTH_TEST)
+glClear(GL_DEPTH_BUFFER_BIT)
+glMaterialfv(GL_FRONT, GL_AMBIENT, [0, 0, 0, 0])
+glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.5, 0, 0, 0])
+glMaterialfv(GL_FRONT, GL_SHININESS, 0.25 * 128)
+for y in range(0, 3):
+  for x in range(0, 3):
+    glutSolidTeapot(0.02)
+    glTranslatef(0.04, 0, 0)
+  glTranslatef(-3 * 0.04, 0, 0.04)
 #load_and_draw_model('out_toyplane.obj')
 pygame.display.flip()
 
