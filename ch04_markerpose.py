@@ -89,8 +89,17 @@ box_trans = homography.normalize(numpy.dot(H, box_cam1))
 
 # compute second camera matrix
 cam2 = camera.Camera(numpy.dot(H, cam1.P))
+
+# H * P transforms points in z = 0 correctly, so its first two colums are
+# correct. The upper left 3x3 submatrix should have orthogonal vectors, use
+# this fact to reconstruct the third (H contains a scale, so this is only
+# well-defined up to scale of the third axis. Fudge something up.)
 A = numpy.dot(numpy.linalg.inv(K), cam2.P[:, :3])
-A = numpy.array([A[:, 0], A[:, 1], numpy.cross(A[:, 0], A[:, 1])]).T
+lenx = numpy.sqrt(numpy.dot(A[:, 0], A[:, 0]))
+leny = numpy.sqrt(numpy.dot(A[:, 1], A[:, 1]))
+#print lenx, leny  # Should be similar.
+zscale = (lenx + leny) / (2 * lenx * leny)
+A = numpy.array([A[:, 0], A[:, 1], zscale * numpy.cross(A[:, 0], A[:, 1])]).T
 cam2.P[:, :3] = numpy.dot(K, A)
 
 # project directly with second camera
