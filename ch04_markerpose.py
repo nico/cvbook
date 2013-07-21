@@ -77,6 +77,7 @@ H = homography.H_from_points(fp, tp)
 
 K = camera.my_calibration(im0.shape[:2])
 
+# How big this appears depends on the z translation in cam1 in the cam1 line.
 box = cube_points([0, 0, 0.1], 0.1)
 
 # project bottom square in first image
@@ -96,10 +97,10 @@ cam2.P[:, :3] = numpy.dot(K, A)
 box_cam2 = cam2.project(homography.make_homog(box))
 
 # test: projecting point on z=0 should be the same either way
-point = numpy.array([1, 1, 0, 1]).T
-print homography.normalize(numpy.dot(numpy.dot(H, cam1.P), point))
-print homography.normalize(numpy.dot(H, cam1.project(point)))
-print cam2.project(point)
+point = numpy.array([[1, 1, 0, 1]]).T
+print homography.normalize(numpy.dot(numpy.dot(H, cam1.P), point)).T
+print homography.normalize(numpy.dot(H, cam1.project(point))).T
+print cam2.project(point).T
 
 
 # visualize
