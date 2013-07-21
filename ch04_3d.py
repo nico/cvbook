@@ -69,6 +69,17 @@ def draw_background(imname):
   glDeleteTextures(tex)
 
 
+def draw_teapot(size):
+  glEnable(GL_LIGHTING)
+  glEnable(GL_LIGHT0)
+  glEnable(GL_DEPTH_TEST)
+  glClear(GL_DEPTH_BUFFER_BIT)
+  glMaterialfv(GL_FRONT, GL_AMBIENT, [0, 0, 0, 0])
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.5, 0, 0, 0])
+  glMaterialfv(GL_FRONT, GL_SHININESS, 0.25 * 128)
+  glutSolidTeapot(size)
+
+
 def setup():
   pygame.init()
   pygame.display.set_mode((width, height), OPENGL | DOUBLEBUF)
@@ -79,8 +90,9 @@ setup()
 draw_background('board.jpeg')
 K = numpy.array([[1, 0], [0, 1]])  # FIXME
 set_projection_from_camera(K)
-Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])  # FIXME
+Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, -10]])  # FIXME
 set_modelview_from_camera(Rt)
+draw_teapot(15)
 pygame.display.flip()
 
 while True:
