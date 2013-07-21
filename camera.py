@@ -42,6 +42,26 @@ class Camera(object):
       self.c = -numpy.dot(self.R.T, self.t)
     return self.c
 
+  def my_calibration(sz):
+    dX = 10.0 # cm
+    dY = 8.0 # cm
+    dZ = 30.0 # cm
+
+    # from Acorn:
+    dx = 1744 - 974 # px
+    dy = 1269 - 650 # px
+
+    fx = (dx / dX) * dZ
+    fy = (dy / dY) * dZ
+
+    row, col = sz
+    fx = fx * col / 2592
+    fy = fy * row / 1944
+    K = numpy.diag([fx, fy, 1])
+    K[0, 2] = 0.5 * col
+    K[1, 2] = 0.5 * row
+    return K
+
 
 def rotation_matrix(a):
   '''Returns a rotation matrix around the axis of a, by an angle that's equal
