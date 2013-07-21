@@ -13,8 +13,8 @@ def set_projection_from_camera(K):
   glMatrixMode(GL_PROJECTION)
   glLoadIdentity()
 
-  fx = K[0, 0]
-  fy = K[1, 1]
+  fx = float(K[0, 0])
+  fy = float(K[1, 1])
   fovy = 2 * numpy.arctan(0.5 * height / fy) * 180 / numpy.pi
   aspect = (width * fy) / (height * fx)
 
@@ -28,7 +28,7 @@ def set_modelview_from_camera(Rt):
   glLoadIdentity()
 
   # Rotate 90 deg around x, so that z is up.
-  Rx = numpy.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+  Rx = numpy.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
 
   # Remove noise from rotation, make sure it's a pure rotation.
   R = Rt[:, :3]
@@ -88,11 +88,11 @@ def setup():
 
 setup()
 draw_background('board.jpeg')
-K = numpy.array([[1, 0], [0, 1]])  # FIXME
+K = numpy.array([[width, 0], [0, height]])  # FIXME
 set_projection_from_camera(K)
 Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, -10]])  # FIXME
 set_modelview_from_camera(Rt)
-draw_teapot(15)
+draw_teapot(2)
 pygame.display.flip()
 
 while True:
