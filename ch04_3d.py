@@ -6,7 +6,7 @@ from pygame.locals import *
 import numpy
 
 
-width, height = 1000, 747
+width, height = 2592 / 2, 1944 / 2
 
 
 def set_projection_from_camera(K):
@@ -101,7 +101,7 @@ def setup():
 
 
 setup()
-draw_background('board.jpeg')
+draw_background('out_ch4pics/h_image.jpg')
 K = numpy.array([[width, 0], [0, height]])  # FIXME
 set_projection_from_camera(K)
 Rt = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, -10]])  # FIXME
