@@ -51,3 +51,28 @@ def plot_epipolar_line(im, F, x, epipole=None, show_epipole=True):
     if epipole is None:
       epipole = compute_right_epipole(F)
     pylab.plot(epipole[0] / epipole[2], epipole[1] / epipole[2], 'r*')
+
+
+def triangulate_point(x1, x2, P1, P2):
+  '''Given two image coordinates x1, x2 of the same point X under different
+  projections P1, P2, recovers X.'''
+  M = numpy.zeros((6, 6))
+  M[:3, :4] = P1
+  M[:3, 4] = -x1
+
+  M[3:, :4] = P2
+  M[3:, 5] = -x2  # Intentionally 5, not 4.
+
+  U, S, V = numpy.linalg.svd(M)
+  X = V[-1, :4]
+  return X / X[3]
+
+
+def triangulate(x1, x2, P1, P2):
+  '''Given n pairs of points, returns their 3d coordinates.'''
+  n = x1.shape[1]
+  if x2.shape[1] != n:
+    raise ValueError('Number of points do not match.')
+
+  X = [triangulate_point(x1[:, i], x2[:, i], P1, P2) for i in range(n)]
+  return numpy.array(X).T
