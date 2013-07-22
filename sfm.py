@@ -94,3 +94,18 @@ def compute_P(x, X):
 
   U, S, V = numpy.linalg.svd(M)
   return V[-1, :12].reshape((3, 4))
+
+
+def skew(a):
+  '''Skew matrix A such that a x v = A*v for any v.'''
+  return numpy.array([[0, -a[2], a[1]],
+                      [a[2], 0, -a[0]],
+                      [-a[1], a[0], 0]])
+
+
+def compute_P_from_fundamental(F):
+  '''Computes second camera matrix, assuming P1 = [I 0].
+  Only up to a homography, since no calibration is given.'''
+  e = compute_right_epipole(F.T)  # left epipole
+  Te = skew(e)
+  return numpy.vstack((numpy.dot(Te, F.T).T, e)).T
