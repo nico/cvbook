@@ -141,6 +141,24 @@ def compute_P_from_fundamental(F):
   return numpy.vstack((numpy.dot(Te, F.T).T, e)).T
 
 
+def compute_P_from_essential(E):
+  # make sure E is rank 2
+  U, S, V = numpy.linalg.svd(E)
+  if numpy.linalg.det(numpy.dot(U, V)) < 0:
+    V = -V
+  E = numpy.dot(U, numpy.dot(numpy.diag([1, 1, 0]), V))
+
+  # create matrices ("Hartley p 258" XXX)
+  Z = skew([0, 0, -1])
+  W = numpy.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+
+  P2 = [numpy.vstack((numpy.dot(U, numpy.dot(W, V)).T,  U[:,2])).T,
+        numpy.vstack((numpy.dot(U, numpy.dot(W, V)).T, -U[:,2])).T,
+        numpy.vstack((numpy.dot(U, numpy.dot(W.T, V)).T,  U[:,2])).T,
+        numpy.vstack((numpy.dot(U, numpy.dot(W.T, V)).T, -U[:,2])).T]
+  return P2
+
+
 class RansacModel(object):
   def fit(self, data):
     data = data.T

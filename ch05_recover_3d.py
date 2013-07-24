@@ -50,4 +50,32 @@ E, inliers = sfm.F_from_ransac(x1n, x2n, model)
 
 tic.k('ransacd')
 
-# FIXME: compute camera matrices, triangulate, plot
+# compute camera matrices
+
+P1 = numpy.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]])
+P2 = sfm.compute_P_from_essential(E)
+
+tic.k('computed possible camera matrices')
+
+# Pick the solution with points in front of cameras
+ind = 0
+maxres = 0
+for i in range(4):
+  X = sfm.triangulate(x1n[:, inliers], x2n[:, inliers], P1, P2[i])
+  d1 = numpy.dot(P1, X)[2]
+  d2 = numpy.dot(P2[i], X)[2]
+  res = numpy.sum(d1 > 0) + numpy.sum(d2 > 0)
+  if res > maxres:
+    maxres = res
+    ind = i
+    infront = (d1 > 0) & (d2 > 0)
+
+tic.k('picked one')
+
+X = sfm.triangulate(x1n[:, inliers], x2n[:, inliers], P1, P2[ind])
+X = X[:, infront]
+
+tic.k('triangulated')
+
+
+# FIXME: plot
