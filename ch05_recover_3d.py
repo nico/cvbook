@@ -42,4 +42,12 @@ K = camera.my_calibration(image[0].shape[:2])
 x1n = numpy.dot(numpy.linalg.inv(K), x1)
 x2n = numpy.dot(numpy.linalg.inv(K), x2)
 
-# FIXME: estimate E, compute camera matrices, triangulate, plot
+tic.k('normalized')
+
+# Estimate E.
+model = sfm.RansacModel()
+E, inliers = sfm.F_from_ransac(x1n, x2n, model)
+
+tic.k('ransacd')
+
+# FIXME: compute camera matrices, triangulate, plot

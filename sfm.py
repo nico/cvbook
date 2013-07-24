@@ -3,7 +3,6 @@ import numpy
 def compute_fundamental(x1, x2):
   '''Computes the fundamental matrix from corresponding points x1, x2 using
   the 8 point algorithm.'''
-
   n = x1.shape[1]
   if x2.shape[1] != n:
     raise ValueError('Number of points do not match.')
@@ -25,6 +24,37 @@ def compute_fundamental(x1, x2):
   S[2] = 0
   F = numpy.dot(U, numpy.dot(numpy.diag(S), V))
   return F
+
+
+def compute_fundamental_normalized(x1, x2):
+  '''Computes the fundamental matrix from corresponding points x1, x2 using
+  the normalized 8 point algorithm.'''
+  n = x1.shape[1]
+  if x2.shape[1] != n:
+    raise ValueError('Number of points do not match.')
+
+  # normalize.
+  x1 = x1 / x1[2]
+  mean_1 = numpy.mean(x1[:2], axis=1)
+  S1 = numpy.sqrt(2) / numpy.std(x1[:2])
+  T1 = numpy.array([[S1, 0, -S1 * mean_1[0]],
+                    [0, S1, -S1 * mean_1[1]],
+                    [0, 0, 1]])
+  x1 = numpy.dot(T1, x1)
+
+  x2 = x2 / x2[2]
+  mean_2 = numpy.mean(x2[:2], axis=1)
+  S2 = numpy.sqrt(2) / numpy.std(x2[:2])
+  T2 = numpy.array([[S2, 0, -S2 * mean_2[0]],
+                    [0, S2, -S2 * mean_2[1]],
+                    [0, 0, 1]])
+  x2 = numpy.dot(T2, x2)
+
+  F = compute_fundamental(x1, x2)
+
+  # denormalize.
+  F = numpy.dot(T1.T, numpy.dot(F, T2))
+  return F / F[2, 2]
 
 
 def compute_right_epipole(F):
@@ -109,3 +139,31 @@ def compute_P_from_fundamental(F):
   e = compute_right_epipole(F.T)  # left epipole
   Te = skew(e)
   return numpy.vstack((numpy.dot(Te, F.T).T, e)).T
+
+
+class RansacModel(object):
+  def fit(self, data):
+    data = data.T
+    x1 = data[:3, :8]
+    x2 = data[3:, :8]
+    return compute_fundamental_normalized(x1, x2)
+
+  def get_error(self, data, F):
+    data = data.T
+    x1 = data[:3]
+    x2 = data[3:]
+
+    # Sampson distance as error.
+    Fx1 = numpy.dot(F, x1)
+    Fx2 = numpy.dot(F, x2)
+    denom = Fx1[0]**2 + Fx1[1]**2 + Fx2[0]**2 + Fx2[1]**2
+    err = (numpy.diag(numpy.dot(x1.T, numpy.dot(F, x2))))**2 / denom
+    return err
+
+
+def F_from_ransac(x1, x2, model, maxiter=5000, match_threshold=1e-6):
+  import ransac
+  data = numpy.vstack((x1, x2))
+  F, ransac_data = ransac.ransac(data.T, model, 8, maxiter, match_threshold, 20,
+                                 return_all=True)
+  return F, ransac_data['inliers']
