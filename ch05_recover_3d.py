@@ -78,4 +78,34 @@ X = X[:, infront]
 tic.k('triangulated')
 
 
-# FIXME: plot
+# Plot!
+from mpl_toolkits.mplot3d import axes3d
+from pylab import *
+
+fig = figure()
+ax = fig.gca(projection='3d')
+ax.plot(-X[0], X[1], X[2], 'k.')
+axis('off')
+
+cam1 = camera.Camera(P1)
+cam2 = camera.Camera(P2[ind])
+x1p = cam1.project(X)
+x2p = cam2.project(X)
+
+x1p = numpy.dot(K, x1p)
+x2p = numpy.dot(K, x2p)
+
+figure()
+imshow(image[0])
+gray()
+plot(x1p[0], x1p[1], 'o')
+plot(x1[0], x1[1], 'r.')
+axis('off')
+
+figure()
+imshow(image[1])
+gray()
+plot(x2p[0], x2p[1], 'o')
+plot(x2[0], x2[1], 'r.')
+axis('off')
+show()
