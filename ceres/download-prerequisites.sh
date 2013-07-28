@@ -15,3 +15,10 @@ if ! [ -d glog ]; then
   mkdir glog
   tar -xj -C glog --strip-components 1 -f $(basename ${GLOG_URL})
 fi
+
+GFLAGS_URL=https://gflags.googlecode.com/files/gflags-2.0-no-svn-files.tar.gz
+if ! [ -d gflags ]; then
+  curl -L -O ${GFLAGS_URL}
+  mkdir gflags
+  tar -xj -C gflags --strip-components 1 -f $(basename ${GFLAGS_URL})
+fi
