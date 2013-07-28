@@ -9,6 +9,7 @@ fetch() {
     curl -L -O ${url}
     mkdir ${dir}
     tar -xj -C ${dir} --strip-components 1 -f $(basename ${url})
+    rm $(basename ${url})
   fi
 }
 
