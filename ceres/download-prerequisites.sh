@@ -7,7 +7,7 @@ fetch() {
   url=${2}
   if ! [ -d ${dir} ]; then
     curl -L -O ${url}
-    mkdir ${dir}
+    mkdir -p ${dir}
     tar -xj -C ${dir} --strip-components 1 -f $(basename ${url})
     rm $(basename ${url})
   fi
@@ -35,3 +35,6 @@ fetch gotoblas2 $GOTOBLAS2_URL
 
 PROTOBUF_URL=https://protobuf.googlecode.com/files/protobuf-2.5.0.tar.bz2
 fetch protobuf $PROTOBUF_URL
+
+CERES_URL=https://ceres-solver.googlecode.com/files/ceres-solver-1.6.0.tar.gz
+fetch ceres $CERES_URL
