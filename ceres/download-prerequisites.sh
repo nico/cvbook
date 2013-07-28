@@ -21,3 +21,17 @@ fetch glog $GLOG_URL
 
 GFLAGS_URL=https://gflags.googlecode.com/files/gflags-2.0-no-svn-files.tar.gz
 fetch gflags $GFLAGS_URL
+
+SUITESPARSE_URL=\
+http://www.cise.ufl.edu/research/sparse/SuiteSparse/current/SuiteSparse.tar.gz
+fetch suitesparse $SUITESPARSE_URL
+
+METIS_URL=http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-4.0.1.tar.gz
+fetch suitesparse/metis-4.0 $METIS_URL
+
+GOTOBLAS2_URL=\
+http://www.tacc.utexas.edu/documents/13601/b58aeb8c-9d8d-4ec2-b5f1-5a5843b4d47b
+fetch gotoblas2 $GOTOBLAS2_URL
+
+PROTOBUF_URL=https://protobuf.googlecode.com/files/protobuf-2.5.0.tar.bz2
+fetch protobuf $PROTOBUF_URL
