@@ -41,12 +41,27 @@ make install
 cd ../..
 
 cd suitesparse
+# FIXME: force 64 bit?
 cp SuiteSparse_config/SuiteSparse_config_Mac.mk \
    SuiteSparse_config/SuiteSparse_config.mk
 make
 make install INSTALL_LIB=${PWD}/../install/lib \
              INSTALL_INCLUDE=${PWD}/../install/include
 cd ..
+cp suitesparse/metis-4.0/libmetis.a install/lib/
+
+mkdir -p build/ceres
+# FIXME: Needs
+#   FIND_LIBRARY(METIS_LIB NAMES metis PATHS ${SUITESPARSE_SEARCH_LIBS})
+# in toplevel CMakeLists.txt and
+#   LIST(APPEND CERES_LIBRARY_DEPENDENCIES ${METIS_LIB})
+# in ceres/internal/ceres/CMakeLists.txt.
+cd build/ceres
+cmake ../../ceres -DCMAKE_INSTALL_PREFIX=${PWD}/../../install \
+                  -DEIGEN_INCLUDE=${PWD}/../../install/include/eigen3
+make -j10
+make install
+cd ../..
 
 # This is only needed for goto2blas:
 # FIXME: need gfortran from http://cran.r-project.org/bin/macosx/tools/
