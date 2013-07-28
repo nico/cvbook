@@ -29,9 +29,11 @@ fetch suitesparse $SUITESPARSE_URL
 METIS_URL=http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/metis-4.0.1.tar.gz
 fetch suitesparse/metis-4.0 $METIS_URL
 
-GOTOBLAS2_URL=\
-http://www.tacc.utexas.edu/documents/13601/b58aeb8c-9d8d-4ec2-b5f1-5a5843b4d47b
-fetch gotoblas2 $GOTOBLAS2_URL
+# Can use -framework Accelerate for blas / lapack on OS X. Probably not quite
+# as fast, but good enough for now.
+#GOTOBLAS2_URL=\
+#http://www.tacc.utexas.edu/documents/13601/b58aeb8c-9d8d-4ec2-b5f1-5a5843b4d47b
+#fetch gotoblas2 $GOTOBLAS2_URL
 
 PROTOBUF_URL=https://protobuf.googlecode.com/files/protobuf-2.5.0.tar.bz2
 fetch protobuf $PROTOBUF_URL
