@@ -21,7 +21,9 @@ sift.process_image(im2f, 'out_sift_2.txt')
 l2, d2 = sift.read_features_from_file('out_sift_2.txt')
 figure(); gray(); sift.plot_features(im2, l2, circle=True)
 
+#matches = sift.match(d1, d2)
 matches = sift.match_twosided(d1, d2)
+print '{} matches'.format(len(matches.nonzero()[0]))
 
 figure()
 gray()
