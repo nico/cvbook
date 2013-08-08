@@ -28,11 +28,11 @@ def read_features_from_file(filename):
   return f[:, :4], f[:, 4:]
 
 
-def read_or_compute(imname, siftname):
+def read_or_compute(imname, siftname, histeq=False):
   '''Returns features from 'siftname' if it exists. Else, computes features from
   'imname', writes them to 'siftname', and returns them.'''
   if not os.path.exists(siftname):
-    process_image(imname, siftname)
+    process_image(imname, siftname, histeq=histeq)
   return read_features_from_file(siftname)
 
 

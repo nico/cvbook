@@ -11,16 +11,24 @@ import sift
 import tic
 
 imname = glob.glob('out_corner/IMG_*.jpg')
+#imname = glob.glob('out_alcatraz/*.jpg')
 siftname = [os.path.splitext(im)[0] + '.sift' for im in imname]
 
 tic.k('start')
 
+# For out_corner, this increases feature count from 4k to 16k and matches from
+# 100 to 170 (which helps quality, but also slows down the program a lot, from
+# from 20s to 60s):
+# NOTE: delete caches after changing this!
+histeq = False
+
 l, d = {}, {}
 for i in range(len(imname)):
-  l[i], d[i] = sift.read_or_compute(imname[i], siftname[i])
+  l[i], d[i] = sift.read_or_compute(imname[i], siftname[i], histeq)
 
 tic.k('loaded sifts')
 
+print '{} / {} features'.format(len(d[0]), len(d[1]))
 if not os.path.exists('out_ch05_recover_match.pickle'):
   matches = sift.match(d[0], d[1])
   pickle.dump(matches, open('out_ch05_recover_match.pickle', 'wb'))
@@ -32,6 +40,8 @@ ndx = matches.nonzero()[0]
 x1 = homography.make_homog(l[0][ndx, :2].T)
 ndx2 = [int(matches[i]) for i in ndx]
 x2 = homography.make_homog(l[1][ndx2, :2].T)
+
+print '{} matches'.format(len(ndx))
 
 image = [numpy.array(Image.open(name)) for name in imname]
 
