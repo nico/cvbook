@@ -45,7 +45,7 @@ def plot_features(im, locs, circle=False):
     for p in locs:
       draw_circle(p[:2], p[2])
   else:
-    plot(locs[:, 0], locs[:, 1], 'ob')
+    pylab.plot(locs[:, 0], locs[:, 1], 'ob')
   pylab.axis('off')
 
 
