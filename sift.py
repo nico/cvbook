@@ -3,10 +3,13 @@ import numpy
 import os
 import scipy.io as sio
 
-def process_image(imagename, resultname,
+def process_image(imagename, resultname, histeq=False,
                   params='--edge-thresh 10 --peak-thresh 5'):
-  if not imagename.endswith('pgm'):
+  if not imagename.endswith('pgm') or histeq:
     im = Image.open(imagename).convert('L')
+    if histeq:
+      import imtools
+      im = Image.fromarray(numpy.uint8(imtools.histeq(numpy.array(im))[0]))
     im.save('out_tmp.pgm')
     imagename = 'out_tmp.pgm'
 
