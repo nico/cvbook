@@ -7,7 +7,7 @@ def compute_fundamental(x1, x2):
   if x2.shape[1] != n:
     raise ValueError('Number of points do not match.')
 
-  # FIXME: normalize!
+  # Normalization is done in compute_fundamental_normalized().
   A = numpy.zeros((n, 9))
   for i in range(n):
     A[i] = [x1[0, i] * x2[0, i],  x1[0, i] * x2[1, i],  x1[0, i] * x2[2, i],
@@ -19,7 +19,7 @@ def compute_fundamental(x1, x2):
   U, S, V = numpy.linalg.svd(A)
   F = V[-1].reshape(3, 3)
 
-  # Constrain F to ranke 2 by zeroing out last singular value.
+  # Constrain F to rank 2 by zeroing out last singular value.
   U, S, V = numpy.linalg.svd(F)
   S[2] = 0
   F = numpy.dot(U, numpy.dot(numpy.diag(S), V))
