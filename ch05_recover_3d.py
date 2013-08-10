@@ -30,7 +30,8 @@ tic.k('loaded sifts')
 
 print '{} / {} features'.format(len(d[0]), len(d[1]))
 if not os.path.exists('out_ch05_recover_match.pickle'):
-  matches = sift.match(d[0], d[1])
+  #matches = sift.match(d[0], d[1])
+  matches = sift.match_twosided(d[0], d[1])
   pickle.dump(matches, open('out_ch05_recover_match.pickle', 'wb'))
 matches = pickle.load(open('out_ch05_recover_match.pickle', 'rb'))
 
@@ -75,6 +76,7 @@ for i in range(4):
   d1 = numpy.dot(P1, X)[2]
   d2 = numpy.dot(P2[i], X)[2]
   res = numpy.sum(d1 > 0) + numpy.sum(d2 > 0)
+  #print i, res
   if res > maxres:
     maxres = res
     ind = i
@@ -118,4 +120,8 @@ gray()
 plot(x2p[0], x2p[1], 'o')
 plot(x2[0], x2[1], 'r.')
 axis('off')
+
+#figure()
+#sift.plot_matches(image[0], image[1], l[0], l[1], matches, show_below=True)
+
 show()
