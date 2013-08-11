@@ -8,27 +8,32 @@ import homography
 import sfm
 
 class SfmTest(unittest.TestCase):
-  def testComputeFundamental(self):
+  def setUp(self):
     points = homography.make_homog(loadtxt('house.p3d').T)
 
     P = hstack((eye(3), array([[0], [0], [0]])))
     cam = camera.Camera(P)
-    x = cam.project(points)
+    self.x = cam.project(points)
 
     r = [0.05, 0.1, 0.15]
     rot = camera.rotation_matrix(r)
     cam.P = dot(cam.P, rot)
     cam.P[:, 3] = array([1, 0, 0])
-    x2 = cam.project(points)
+    self.x2 = cam.project(points)
 
     K, R, t = cam.factor()
-    expectedE = dot(sfm.skew(t), R)
-    expectedE /= expectedE[2, 2]
+    self.expectedE = dot(sfm.skew(t), R)
+    self.expectedE /= self.expectedE[2, 2]
 
-    E = sfm.compute_fundamental(x2[:8], x[:8])
+  def testComputeFundamental(self):
+    E = sfm.compute_fundamental(self.x2[:8], self.x[:8])
+    self.assertEqual(self.expectedE.shape, E.shape)
+    self.assertTrue(numpy.allclose(self.expectedE, E))
 
-    self.assertEqual(expectedE.shape, E.shape)
-    self.assertTrue(numpy.allclose(expectedE, E))
+  def testComputeFundamentalNormalized(self):
+    E = sfm.compute_fundamental_normalized(self.x2[:8], self.x[:8])
+    self.assertEqual(self.expectedE.shape, E.shape)
+    self.assertTrue(numpy.allclose(self.expectedE, E))
 
 
 if __name__ == '__main__':
