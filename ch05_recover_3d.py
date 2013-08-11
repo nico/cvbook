@@ -57,7 +57,10 @@ tic.k('normalized')
 
 # Estimate E.
 model = sfm.RansacModel()
-E, inliers = sfm.F_from_ransac(x1n, x2n, model)
+# Note that x2n is passed as first parameter, since F_from_ransac() and friends
+# compute the F matrix mapping from the 2nd parameter to the first, and the
+# code below gives camera 1 the identity transform.
+E, inliers = sfm.F_from_ransac(x2n, x1n, model)
 
 tic.k('ransacd')
 
@@ -76,7 +79,6 @@ for i in range(4):
   d1 = numpy.dot(P1, X)[2]
   d2 = numpy.dot(P2[i], X)[2]
   res = numpy.sum(d1 > 0) + numpy.sum(d2 > 0)
-  #print i, res
   if res > maxres:
     maxres = res
     ind = i
@@ -96,7 +98,7 @@ from pylab import *
 
 fig = figure()
 ax = fig.gca(projection='3d')
-ax.plot(-X[0], X[1], X[2], 'k.')
+ax.plot(X[0], X[1], X[2], 'k.')
 axis('off')
 
 cam1 = camera.Camera(P1)
