@@ -9,7 +9,11 @@ import sfm
 
 class SfmTest(unittest.TestCase):
   def setUp(self):
-    points = homography.make_homog(loadtxt('house.p3d').T)
+    points = array([
+      [-1.1, -1.1, -1.1], [ 1.4, -1.4, -1.4], [-1.5,  1.5, -1], [ 1,  1.8, -1],
+      [-1.2, -1.2,  1.2], [ 1.3, -1.3,  1.3], [-1.6,  1.6,  1], [ 1,  1.7,  1],
+      ])
+    points = homography.make_homog(points.T)
 
     P = hstack((eye(3), array([[0], [0], [0]])))
     cam = camera.Camera(P)
@@ -26,12 +30,12 @@ class SfmTest(unittest.TestCase):
     self.expectedE /= self.expectedE[2, 2]
 
   def testComputeFundamental(self):
-    E = sfm.compute_fundamental(self.x2[:8], self.x[:8])
+    E = sfm.compute_fundamental(self.x2[:, :8], self.x[:, :8])
     self.assertEqual(self.expectedE.shape, E.shape)
     self.assertTrue(numpy.allclose(self.expectedE, E))
 
   def testComputeFundamentalNormalized(self):
-    E = sfm.compute_fundamental_normalized(self.x2[:8], self.x[:8])
+    E = sfm.compute_fundamental_normalized(self.x2[:, :8], self.x[:, :8])
     self.assertEqual(self.expectedE.shape, E.shape)
     self.assertTrue(numpy.allclose(self.expectedE, E))
 
