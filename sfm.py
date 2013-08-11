@@ -23,7 +23,7 @@ def compute_fundamental(x1, x2):
   U, S, V = numpy.linalg.svd(F)
   S[2] = 0
   F = numpy.dot(U, numpy.dot(numpy.diag(S), V))
-  return F
+  return F / F[2, 2]
 
 
 def compute_fundamental_normalized(x1, x2):
@@ -149,7 +149,7 @@ def compute_P_from_essential(E):
   E = numpy.dot(U, numpy.dot(numpy.diag([1, 1, 0]), V))
 
   # create matrices ("Hartley p 258" XXX)
-  Z = skew([0, 0, -1])
+  Z = skew([0, 0, -1])  # FIXME: Unused?
   W = numpy.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
 
   P2 = [numpy.vstack((numpy.dot(U, numpy.dot(W, V)).T,  U[:,2])).T,
