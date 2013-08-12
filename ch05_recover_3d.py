@@ -19,6 +19,7 @@ tic.k('start')
 # For out_corner, this increases feature count from 4k to 16k and matches from
 # 100 to 170 (which helps quality, but also slows down the program a lot, from
 # from 20s to 60s):
+# (with twosided matching, matches go from 85 to 113 for out_corner)
 # NOTE: delete caches after changing this!
 histeq = False
 
