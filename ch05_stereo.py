@@ -11,5 +11,9 @@ wid = 9
 
 res = stereo.plane_sweep_ncc(im_l, im_r, start, steps, wid)
 
+wid = 3
+res_gauss = stereo.plane_sweep_gauss(im_l, im_r, start, steps, wid)
+
 import scipy.misc
 scipy.misc.imsave('out_depth.png', res)
+scipy.misc.imsave('out_depth_gauss.png', res_gauss)
