@@ -10,9 +10,14 @@ start = 4
 wid = 9
 
 res1 = stereo.plane_sweep_ncc(im_l, im_r, start, steps, wid)
-def inv(x): return -start + 1 - x
-res2 = inv(stereo.plane_sweep_ncc(im_r, im_l, inv(steps), steps, wid))
+res2 = steps - 1 - stereo.plane_sweep_ncc(im_r, im_l, -start - steps + 1,
+    steps, wid)
 
 import scipy.misc
 scipy.misc.imsave('out_depth_twosided.png', res1)
 scipy.misc.imsave('out_depth_twosided2.png', res2)
+
+# Checking for left/right match consistency during plane sweeping would lead to
+# fewer unknown pixels, but it might require writing the inner loop in python.
+res = (res1 == res2) * res1
+scipy.misc.imsave('out_depth_twosided_c.png', res)
