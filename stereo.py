@@ -31,6 +31,23 @@ def plane_sweep_ncc(im_l, im_r, start, steps, wid):
   return numpy.argmax(dmaps, axis=2)
 
 
+def plane_sweep_ssd(im_l, im_r, start, steps, wid):
+  '''Find disparity image using sum of squared differences.'''
+
+  m, n = im_l.shape  # Must match im_r.shape.
+
+  s = numpy.zeros(im_l.shape)
+
+  dmaps = numpy.zeros((m, n, steps))
+
+  for disp in range(steps):
+    filters.uniform_filter((numpy.roll(im_l, -disp - start) - im_r) ** 2,
+                           wid, s)
+    dmaps[:, :, disp] = s
+
+  return numpy.argmin(dmaps, axis=2)
+
+
 def plane_sweep_gauss(im_l, im_r, start, steps, wid):
   '''Find disparity image using normalized cross-correlation with Gaussian
   weighted neighborhoods.'''
@@ -61,3 +78,22 @@ def plane_sweep_gauss(im_l, im_r, start, steps, wid):
     dmaps[:, :, disp] = s / numpy.sqrt(s_l * s_r)
 
   return numpy.argmax(dmaps, axis=2)
+
+
+def plane_sweep_gauss_ssd(im_l, im_r, start, steps, wid):
+  '''Find disparity image using sum of squared differences with Gaussian
+  weighted neighborhoods.'''
+
+  m, n = im_l.shape  # Must match im_r.shape.
+
+  s = numpy.zeros(im_l.shape)
+
+  dmaps = numpy.zeros((m, n, steps))
+
+  for disp in range(steps):
+    filters.gaussian_filter((numpy.roll(im_l, -disp - start) - im_r) ** 2,
+                            wid, 0, s)
+    dmaps[:, :, disp] = s
+
+  return numpy.argmin(dmaps, axis=2)
+
