@@ -69,6 +69,7 @@ def match(desc1, desc2):
     #indx = numpy.argsort(numpy.arccos(dotprods))
     indx = numpy.argsort(-dotprods)
 
+    # Only keep best match if it's noticeably better than the next best match.
     if (numpy.arccos(dotprods)[indx[0]] <
         dist_ratio * numpy.arccos(dotprods)[indx[1]]):
       matchscores[i] = int(indx[0])

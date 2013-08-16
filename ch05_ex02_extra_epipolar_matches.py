@@ -64,7 +64,7 @@ if not os.path.exists(ransaccache):
   pickle.dump((E, inliers), open(ransaccache, 'wb'))
 E, inliers = pickle.load(open(ransaccache, 'rb'))
 
-tic.k('ransacd')
+tic.k('ransacd, %d inliers' % len(inliers))
 
 # compute camera matrices
 
@@ -93,6 +93,36 @@ X = X[:, infront]
 
 tic.k('triangulated')
 
+
+unmatched1 = homography.make_homog(numpy.delete(l[0], ndx, axis=0)[:, :2].T)
+unmatched1d = numpy.delete(d[0], ndx, axis=0)
+unmatched1n = numpy.dot(numpy.linalg.inv(K), unmatched1)
+
+unmatched2 = homography.make_homog(numpy.delete(l[1], ndx2, axis=0)[:, :2].T)
+unmatched2d = numpy.delete(d[1], ndx2, axis=0)
+unmatched2n = numpy.dot(numpy.linalg.inv(K), unmatched2)
+
+# For every feature in image 1, collect all feature descriptors in image 2 whose
+# locations are close to the feature's epipolar line and compute the best one.
+print 'unmatched:', unmatched1n.shape[1]
+Ep = numpy.dot(unmatched1n.T, E)
+umatchscores = numpy.zeros((unmatched1n.shape[1], 1), 'int')
+for i in range(unmatched1n.shape[1]):
+  e = Ep[i, :]
+  Dist = numpy.dot(e, unmatched2n) ** 2
+  I = Dist < 1e-4
+  #print '%d possible matches for feature %d' % (numpy.sum(I), i)
+
+  Ds = unmatched2d[I]
+  if Ds.shape[0] >= 2:
+    umatchscores[i] = sift.match(numpy.array([unmatched1d[i]]), Ds)[0]
+  else:
+    umatchscores[i] = 0
+
+# Keep the 25% best matches, triangulate those.
+# XXX: implement ^
+
+tic.k('unmatched features epipoled')
 
 # Plot!
 from mpl_toolkits.mplot3d import axes3d
