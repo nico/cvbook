@@ -17,7 +17,13 @@ import scipy.misc
 scipy.misc.imsave('out_depth_twosided.png', res1)
 scipy.misc.imsave('out_depth_twosided2.png', res2)
 
-# Checking for left/right match consistency during plane sweeping would lead to
-# fewer unknown pixels, but it might require writing the inner loop in python.
 res = (res1 == res2) * res1
+scipy.misc.imsave('out_depth_twosided_c_sparse.png', res)
+
+# Use first disparity image to align second disparity with first.
+ir, ic = numpy.mgrid[:res1.shape[0], :res1.shape[1]]
+mv = res2[ir, (ic + res1) % res1.shape[1]]
+scipy.misc.imsave('out_tmp.png', mv)
+
+res = (res1 == mv) * res1
 scipy.misc.imsave('out_depth_twosided_c.png', res)
