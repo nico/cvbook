@@ -61,6 +61,7 @@ while fp.shape[1] >= 14:
   inliers_pts = tp[:2, inliers]
   plot(inliers_pts[0], inliers_pts[1], colors[i])
 
+  # Compute complement.
   fp = numpy.delete(fp, inliers, axis=1)
   tp = numpy.delete(tp, inliers, axis=1)
   i += 1
