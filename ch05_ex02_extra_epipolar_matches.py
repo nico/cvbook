@@ -115,12 +115,20 @@ unmatched2n = unmatched2n[:, :N]
 # For every feature in image 1, collect all feature descriptors in image 2 whose
 # locations are close to the feature's epipolar line and compute the best one.
 print 'unmatched:', unmatched1n.shape[1]
-Ep = numpy.dot(unmatched1n.T, E)
+#Ep = numpy.dot(unmatched1n.T, E)
+Ep = numpy.dot(E, unmatched1n)
 umatchscores = numpy.zeros((unmatched1n.shape[1], 1), 'int')
 for i in range(unmatched1n.shape[1]):
-  e = Ep[i, :]
-  Dist = numpy.dot(e, unmatched2n) ** 2
-  I = Dist < (1e-4 ** 2)
+  e = Ep[:, i]
+
+  # Normalize plane equation, so that Dist is in (calibrated) pixels.
+  planelen = numpy.sqrt(e[0] ** 2 + e[1] ** 2)
+  print planelen
+  e /= planelen
+
+  Dist = numpy.dot(unmatched2n.T, e) ** 2
+  #I = Dist < (1e-4 ** 2)
+  I = Dist < (1e-3 / K[0][0]) ** 2
   #print '%d possible matches for feature %d' % (numpy.sum(I), i)
 
   Ds = unmatched2d[I]
@@ -153,6 +161,14 @@ ux1n = unmatched1n[:, undx]
 undx2 = [int(umatchscores[i]) for i in undx]
 ux2 = unmatched2[:, undx2]
 ux2n = unmatched2n[:, undx2]
+
+# Debugging: Print match quality.
+#for i in undx:
+  #x1 = unmatched1n[:, i]
+  #x2 = unmatched2n[:, int(umatchscores[i])]
+  #print numpy.dot(x1.T, numpy.dot(E, x2))
+  #print unmatched1[:, i]
+  #print unmatched2[:, int(umatchscores[i])]
 
 UX = sfm.triangulate(ux1n, ux2n, P1, P2[ind])
 
