@@ -102,6 +102,16 @@ unmatched2 = homography.make_homog(numpy.delete(l[1], ndx2, axis=0)[:, :2].T)
 unmatched2d = numpy.delete(d[1], ndx2, axis=0)
 unmatched2n = numpy.dot(numpy.linalg.inv(K), unmatched2)
 
+# Limit point set for debugging.
+N = 1000  # Pick so that only a handful new features are found.
+unmatched1 = unmatched1[:, :N]
+unmatched1d = unmatched1d[:N, :]
+unmatched1n = unmatched1n[:, :N]
+
+unmatched2 = unmatched2[:, :N]
+unmatched2d = unmatched2d[:N, :]
+unmatched2n = unmatched2n[:, :N]
+
 # For every feature in image 1, collect all feature descriptors in image 2 whose
 # locations are close to the feature's epipolar line and compute the best one.
 print 'unmatched:', unmatched1n.shape[1]
@@ -110,19 +120,47 @@ umatchscores = numpy.zeros((unmatched1n.shape[1], 1), 'int')
 for i in range(unmatched1n.shape[1]):
   e = Ep[i, :]
   Dist = numpy.dot(e, unmatched2n) ** 2
-  I = Dist < 1e-4
+  I = Dist < (1e-4 ** 2)
   #print '%d possible matches for feature %d' % (numpy.sum(I), i)
 
   Ds = unmatched2d[I]
   if Ds.shape[0] >= 2:
-    umatchscores[i] = sift.match(numpy.array([unmatched1d[i]]), Ds)[0]
-  else:
+    # FIXME: This isn't right, since sift.match() returns indices relative to
+    # the subset Ds, not relative to all descriptors.
+    #umatchscores[i] = sift.match(numpy.array([unmatched1d[i]]), Ds)[0]
+    #if umatchscores[i] != 0:
+    print 'multiple (%d) hits for %d (skipping)' % (Ds.shape[0], i)
     umatchscores[i] = 0
-
-# Keep the 25% best matches, triangulate those.
-# XXX: implement ^
+  else:
+    if Ds.shape[0] == 1:
+      print '1 hit for', i
+      #print Ds.shape
+      # FIXME: Probably want to check that the feature descriptors look at least
+      # somewhat alike.
+      umatchscores[i] = I.nonzero()[0]
+    else:
+      umatchscores[i] = 0
 
 tic.k('unmatched features epipoled')
+
+# Keep the 25% best matches...
+# XXX: implement ^
+
+# ...triangulate those.
+undx = umatchscores.nonzero()[0]
+ux1 = unmatched1[:, undx]
+ux1n = unmatched1n[:, undx]
+undx2 = [int(umatchscores[i]) for i in undx]
+ux2 = unmatched2[:, undx2]
+ux2n = unmatched2n[:, undx2]
+
+UX = sfm.triangulate(ux1n, ux2n, P1, P2[ind])
+
+tic.k('unmatched features triangulated')
+X = UX
+x1 = ux1
+x2 = ux2
+
 
 # Plot!
 from mpl_toolkits.mplot3d import axes3d
@@ -131,10 +169,13 @@ from pylab import *
 fig = figure()
 ax = fig.gca(projection='3d')
 ax.plot(X[0], X[1], X[2], 'k.')
+#ax.plot(UX[0], UX[1], UX[2], 'g.')
 axis('off')
 
 cam1 = camera.Camera(P1)
 cam2 = camera.Camera(P2[ind])
+#x1p = cam1.project(UX)
+#x2p = cam2.project(UX)
 x1p = cam1.project(X)
 x2p = cam2.project(X)
 
@@ -153,6 +194,16 @@ imshow(image[1])
 gray()
 plot(x2p[0], x2p[1], 'o')
 plot(x2[0], x2[1], 'r.')
+
+#print ux1
+#print ux1n
+#print E
+for i in range(ux1n.shape[1]):
+  # E is in calibrated camera coordinates, but plot_epipolar_line() draws
+  # pixels, so bake the calibration matrix into E for this call.
+  sfm.plot_epipolar_line(
+      image[1], numpy.dot(numpy.linalg.inv(K.T), E), ux1n[:, i])
+
 axis('off')
 
 #figure()
