@@ -3,12 +3,16 @@ import pca
 from PIL import Image, ImageDraw
 from pylab import *
 
-imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_selected_thumbs')
+# PCA on all images.
+imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_thumbs')
 imcount = len(imlist)
-
-# Load images, run PCA.
 immatrix = array([array(Image.open(im)).flatten() for im in imlist], 'f')
 V, S, immean = pca.pca(immatrix)
+
+# Visualize only selected images.
+imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_selected_thumbs')
+imcount = len(imlist)
+immatrix = array([array(Image.open(im)).flatten() for im in imlist], 'f')
 
 # Project on 2 PCs.
 projected = array(

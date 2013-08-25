@@ -4,12 +4,16 @@ from PIL import Image
 from pylab import *
 from scipy.cluster.vq import *
 
-imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_selected_thumbs')
+# PCA on all images.
+imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_thumbs')
 imcount = len(imlist)
-
-# Load images, run PCA.
 immatrix = array([array(Image.open(im)).flatten() for im in imlist], 'f')
 V, S, immean = pca.pca(immatrix)
+
+# Visualize only selected images.
+imlist = imtools.get_imlist('/Users/thakis/Downloads/data/a_selected_thumbs')
+imcount = len(imlist)
+immatrix = array([array(Image.open(im)).flatten() for im in imlist], 'f')
 
 # Project on 40 first PCs.
 projected = array([dot(V[:40], immatrix[i] - immean) for i in range(imcount)])
