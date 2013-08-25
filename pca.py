@@ -12,6 +12,8 @@ def pca(X):
 
   if dim > num_data:
     # Usual case: Fewer images than pixels per image. Use compact trick.
+    # (see e.g.
+    # http://www.doc.ic.ac.uk/~dfg/ProbabilisticInference/IDAPILecture15.pdf)
     Cov = numpy.dot(X, X.T)  # (Note: not normalized)
     e, EV = numpy.linalg.eigh(Cov)
     tmp = numpy.dot(X.T, EV).T  # compact trick
