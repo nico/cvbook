@@ -1,3 +1,4 @@
+import hcluster
 import imtools
 import pca
 from PIL import Image
@@ -17,6 +18,10 @@ immatrix = array([array(Image.open(im)).flatten() for im in imlist], 'f')
 
 # Project on 40 first PCs.
 projected = array([dot(V[:40], immatrix[i] - immean) for i in range(imcount)])
+
+# hierarchical clustering.
+tree = hcluster.hcluster(projected)
+hcluster.draw_dendrogram(tree, imlist, filename='out_font.png')
 
 # k means.
 K = 4
