@@ -16,3 +16,16 @@ for i, f in enumerate(imlist):
 
 tree = hcluster.hcluster(features)
 hcluster.draw_dendrogram(tree, imlist, filename='out_sunset.png')
+
+# visualize clusters
+clusters = tree.extract_clusters(dist=0.23 * tree.distance)
+for c in clusters:
+  elements = c.get_cluster_elements()
+  if len(elements) > 3:
+    figure()
+    for p in range(minimum(len(elements), 20)):
+      subplot(4, 5, p + 1)
+      im = array(Image.open(imlist[elements[p]]))
+      imshow(im)
+      axis('off')
+show()
