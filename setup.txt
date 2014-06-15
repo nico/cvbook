@@ -16,7 +16,7 @@ Put jpeglib and zlib below Imaging folder. Edit jconfig.h, then run
 
     PYTHONPATH=../../src/ninja/misc python ninja.py && ninja
 
-to build thld them
+to build them.
 
 Edit setup.py to have:
 
