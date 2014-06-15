@@ -25,7 +25,7 @@ Edit setup.py to have:
 
 Build PIL:
 
-    python setup.py build
+    CFLAGS=-Qunused-arguments python setup.py build
     sudo python setup.py install
 
 
