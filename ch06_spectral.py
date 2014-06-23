@@ -31,6 +31,7 @@ rowsum = sum(S, axis=0)
 D = diag(1 / sqrt(rowsum))
 I = identity(n)
 L = I - dot(D, dot(S, D))
+#L = dot(dot(D, D), S)  # Ch06, Exercise 5
 
 # compute eigenvectors of L
 U,sigma,V = linalg.svd(L)
