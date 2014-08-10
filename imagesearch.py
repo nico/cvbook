@@ -59,3 +59,34 @@ class Indexer(object):
     cur = self.con.execute('insert into imlist(filename) values (?)',
                            (imname,))
     return cur.lastrowid
+
+
+class Searcher(object):
+  def __init__(self, db, voc):
+    """Initialize with the name of the database and a vocabulary object."""
+    self.con = sqlite3.connect(db)
+    self.voc = voc
+
+  def __del__(self):
+    self.con.close()
+
+  def candidates_from_word(self, imword):
+    """Get list of images containing imword."""
+    im_ids = self.con.execute(
+        'select distinct imid from imwords where wordid = ?',
+        (int(imword),)).fetchall()
+    return [i[0] for i in im_ids]
+
+  def candidates_from_histogram(self, imwords):
+    """Get list of images with similar words."""
+    words = imwords.nonzero()[0]
+    candidates = []
+    for word in words:
+      candidates += self.candidates_from_word(word)
+
+    # Take all unique words and reverse-sort on occurrence.
+    tmp = [(w, candidates.count(w)) for w in set(candidates)]
+    tmp.sort(key=lambda x: x[1], reverse=True)
+
+    # Return sorted list, best matches first.
+    return [w[0] for w in tmp]
