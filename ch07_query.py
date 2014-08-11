@@ -23,3 +23,5 @@ imwords = voc.project(descr)
 print 'ask using a histogram...'
 print src.candidates_from_histogram(imwords)[:10]
 
+print 'try a query...'
+print src.query(imlist[0])[:10]

@@ -90,3 +90,27 @@ class Searcher(object):
 
     # Return sorted list, best matches first.
     return [w[0] for w in tmp]
+
+  def get_imhistogram(self, imname):
+    """Return the word histogram for an image."""
+    imid = self.con.execute('select rowid from imlist where filename = ?',
+                             (imname,)).fetchone()
+    s = self.con.execute('select histogram from imhistograms where rowid = ?',
+                         imid).fetchone()
+    return pickle.loads(str(s[0]))
+
+  def query(self, imname):
+    """Find a list of matching images for imname."""
+    import numpy
+    h = self.get_imhistogram(imname)
+    candidates = self.candidates_from_histogram(h)
+
+    matchscores = []
+    for imid in candidates:
+      cand_name = self.con.execute(
+          'select filename from imlist where rowid = ?', (imid,)).fetchone()[0]
+      cand_h = self.get_imhistogram(cand_name)
+      cand_dist = numpy.sqrt(numpy.sum((h - cand_h)**2))
+      matchscores.append((cand_dist, imid))
+    matchscores.sort()
+    return matchscores
