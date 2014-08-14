@@ -99,6 +99,10 @@ class Searcher(object):
                          imid).fetchone()
     return pickle.loads(str(s[0]))
 
+  def get_filename(self, imid):
+    return self.con.execute(
+        'select filename from imlist where rowid = ?', (imid,)).fetchone()[0]
+
   def query(self, imname):
     """Find a list of matching images for imname."""
     import numpy
@@ -107,9 +111,7 @@ class Searcher(object):
 
     matchscores = []
     for imid in candidates:
-      cand_name = self.con.execute(
-          'select filename from imlist where rowid = ?', (imid,)).fetchone()[0]
-      cand_h = self.get_imhistogram(cand_name)
+      cand_h = self.get_imhistogram(self.get_filename(imid))
       cand_dist = numpy.sqrt(numpy.sum((h - cand_h)**2))
       matchscores.append((cand_dist, imid))
     matchscores.sort()
@@ -127,3 +129,18 @@ def compute_ukbench_score(searcher, imlist):
     pos[i] = [w[1] - 1 for w in searcher.query(imlist[i])[:4]]
   score = numpy.array([(pos[i] // 4) == (i // 4) for i in range(im_count)])*1.0
   return numpy.sum(score) / im_count
+
+
+def plot_results(searcher, res):
+  """Show images in result list `res`, a list of image ids."""
+  import matplotlib.pyplot
+  import numpy
+  from PIL import Image
+  matplotlib.pyplot.figure()
+  res_count = len(res)
+  for i in range(res_count):
+    imname = searcher.get_filename(res[i])
+    matplotlib.pyplot.subplot(1, res_count, i + 1)
+    matplotlib.pyplot.imshow(numpy.array(Image.open(imname)))
+    matplotlib.pyplot.axis('off')
+  matplotlib.pyplot.show()

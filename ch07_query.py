@@ -24,7 +24,12 @@ print 'ask using a histogram...'
 print searcher.candidates_from_histogram(imwords)[:10]
 
 print 'try a query...'
-print searcher.query(imlist[0])[:10]
+res = searcher.query(imlist[0])[:10]
+print res
 
-print 'score (takes about 10 seconds):'
-print imagesearch.compute_ukbench_score(searcher, imlist)
+print 'score:'
+# Score a small subset, so this runs fast.
+print imagesearch.compute_ukbench_score(searcher, imlist[:10])
+
+# Plot images most similar to imlist[0].
+imagesearch.plot_results(searcher, [r[1] for r in res[:6]])
