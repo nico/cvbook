@@ -114,3 +114,16 @@ class Searcher(object):
       matchscores.append((cand_dist, imid))
     matchscores.sort()
     return matchscores
+
+
+def compute_ukbench_score(searcher, imlist):
+  """Returns teh average number of correct images on the top four query results.
+  """
+  import numpy
+  im_count = len(imlist)
+  pos = numpy.zeros((im_count, 4))
+  for i in range(im_count):
+    # query() results are 1-based, convert to 0-based.
+    pos[i] = [w[1] - 1 for w in searcher.query(imlist[i])[:4]]
+  score = numpy.array([(pos[i] // 4) == (i // 4) for i in range(im_count)])*1.0
+  return numpy.sum(score) / im_count

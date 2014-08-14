@@ -8,20 +8,23 @@ import imagesearch
 query it.
 """
 
-imlist = imtools.get_imlist('/Users/thakis/Downloads/ukbench/first1000')
+imlist = imtools.get_imlist('/Users/thakis/Downloads/ukbench/first1000')[:100]
 imcount = len(imlist)
 featlist = [imlist[i][:-3] + 'sift' for i in range(imcount)]
 
 with open('vocabulary.pkl', 'rb') as f:
   voc = pickle.load(f)
 
-src = imagesearch.Searcher('test.db', voc)
+searcher = imagesearch.Searcher('test.db', voc)
 
 locs, descr = sift.read_features_from_file(featlist[0])
 imwords = voc.project(descr)
 
 print 'ask using a histogram...'
-print src.candidates_from_histogram(imwords)[:10]
+print searcher.candidates_from_histogram(imwords)[:10]
 
 print 'try a query...'
-print src.query(imlist[0])[:10]
+print searcher.query(imlist[0])[:10]
+
+print 'score (takes about 10 seconds):'
+print imagesearch.compute_ukbench_score(searcher, imlist)
