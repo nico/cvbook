@@ -32,11 +32,11 @@ model = homography.RansacModel()
 
 rank = {}
 for ndx in res[1:]:
-  locs, descr = sift.read_features_from_file(featlist[ndx])
+  locs, descr = sift.read_features_from_file(featlist[ndx - 1]) # res is 1-based
 
   matches = sift.match(q_descr, descr)
   ind = matches.nonzero()[0]
-  ind2 = matches[ind]
+  ind2 = [int(matches[i]) for i in ind]
   tp = homography.make_homog(locs[:, :2].T)
 
   try:
