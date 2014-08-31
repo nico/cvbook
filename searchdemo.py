@@ -1,4 +1,4 @@
-import cherrypy, os, random, urllib
+import cherrypy, os, random
 import cPickle as pickle
 
 import imagesearch
@@ -43,16 +43,21 @@ class SearchDemo(object):
       for dist, ndx in res:
         imname = self.searcher.get_filename(ndx)
         html += '<a href="?query=%s">' % imname
-        html += '<img src="%s" width=100>' % imname
+        html += '<img src="/img/%s" width=100>' % os.path.basename(imname)
         html += '</a>'
     else:
       random.shuffle(self.ndx)
       for i in self.ndx[:self.maxresults]:
         imname = self.imlist[i]
         html += '<a href="?query=%s">' % imname
-        html += '<img src="file://%s" width=100>' % imname
+        html += '<img src="/img/%s" width=100>' % os.path.basename(imname)
         html += '</a>'
     html += self.footer
     return html
 
-cherrypy.quickstart(SearchDemo())
+config = { '/img': {
+    'tools.staticdir.on': True,
+    'tools.staticdir.dir': '/Users/thakis/Downloads/ukbench/first1000',
+}}
+
+cherrypy.quickstart(SearchDemo(), '/', config=config)
