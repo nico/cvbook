@@ -50,3 +50,9 @@ PyOpenGL:
 Data files:
 
 merton1 from http://www.robots.ox.ac.uk/~vgg/data/data-mview.html
+
+CherryPy:
+
+Hit "Download" on http://www.cherrypy.org/ , get zip, cd there, do
+
+  sudo python setup.py install
