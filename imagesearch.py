@@ -119,7 +119,7 @@ class Searcher(object):
 
 
 def compute_ukbench_score(searcher, imlist):
-  """Returns teh average number of correct images on the top four query results.
+  """Returns the average number of correct images on the top four query results.
   """
   import numpy
   im_count = len(imlist)

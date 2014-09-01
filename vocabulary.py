@@ -18,7 +18,7 @@ class Vocabulary(object):
 
     descr = []
     descr.append(sift.read_features_from_file(featurefiles[0])[1])
-    descriptors = descr[0]  # Stack features for m-means.
+    descriptors = descr[0]  # Stack features for k-means.
     for i in numpy.arange(1, image_count):
       descr.append(sift.read_features_from_file(featurefiles[i])[1])
       descriptors = numpy.vstack((descriptors, descr[i]))
