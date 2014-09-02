@@ -45,3 +45,34 @@ def compute_average(imlist):
       print name + '...skipped'
   avg /= count
   return numpy.array(avg, 'uint8')
+
+
+def plot_2d_boundary(plot_range, points, decisionfun, labels, values=[0]):
+  """plot_range is (xmin, xmax, ymin, ymax), points is a list of class points,
+  decisionfun is a function to evaluate, labels is a list of labels that
+  decisionfun returns for each class, values is a list of decision contours to
+  show."""
+  import matplotlib.pyplot
+
+  clist = ['b', 'r', 'g', 'k', 'm', 'y']  # Colors for the classes.
+
+  # Plot contour.
+  x = numpy.arange(plot_range[0], plot_range[1], 0.5)
+  y = numpy.arange(plot_range[2], plot_range[3], 0.5)
+  xx, yy = numpy.meshgrid(x, y)
+  xxx, yyy = xx.flatten(), yy.flatten()
+  zz = numpy.array(decisionfun(xxx, yyy))
+  zz = zz.reshape(xx.shape)
+  matplotlib.pyplot.contour(xx, yy, zz, values)
+
+  # For each class, plot the points with '*' for correct, 'o' for incorrect.
+  for i in range(len(points)):
+    d = decisionfun(points[i][:, 0], points[i][:, 1])
+    cor_ndx = labels[i] == d
+    incor_ndx = labels[i] != d
+    matplotlib.pyplot.plot(
+        points[i][cor_ndx, 0], points[i][cor_ndx, 1], '*', color=clist[i])
+    matplotlib.pyplot.plot(
+        points[i][incor_ndx, 0], points[i][incor_ndx, 1], 'o', color=clist[i])
+
+  matplotlib.pyplot.axis('equal')
