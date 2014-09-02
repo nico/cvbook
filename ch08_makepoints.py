@@ -18,7 +18,8 @@ with open('points_normal.pkl', 'w') as f:
   pickle.dump(labels, f)
 
 
-# Create two normal distributions in circular shape.
+# Create one normal distribution with a second ring-shaped distribution around
+# it.
 class_1 = 0.6 * randn(n, 2)
 r = 0.8 * randn(n, 1) + 5
 angle = 2*pi * randn(n, 1)
