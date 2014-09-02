@@ -20,4 +20,9 @@ with open('points_normal_test.pkl') as f:
   class_2 = pickle.load(f)
   labels = pickle.load(f)
 
-print model.classify(class_1[0])
+n = class_1.shape[0]
+n_correct = 0
+for i in range(n):
+  if model.classify(class_1[i]) == labels[i]: n_correct += 1
+  if model.classify(class_2[i]) == labels[n + i]: n_correct += 1
+print 'percent correct:', 100 * n_correct / float(2 * n)

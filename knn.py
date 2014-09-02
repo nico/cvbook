@@ -18,8 +18,7 @@ class KnnClassifier(object):
       votes.setdefault(label, 0)
       votes[label] += 1
 
-    # FIXME: this looks wrong:
-    return max(votes)
+    return max(votes, key=votes.get)
 
 
 def L2dist(p1, p2):
