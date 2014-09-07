@@ -37,6 +37,5 @@ def gauss(m, v, x):
     n, d = x.shape
   S = numpy.diag(1 / v)
   x = x - m
-  # FIXME: Can't this be written as exp(-0.5 * dot(x, x.T) / v)?
   y = numpy.exp(-0.5 * numpy.diag(numpy.dot(x, numpy.dot(S, x.T))))
   return y * (2 * numpy.pi)**(-d / 2.0) / (numpy.sqrt(numpy.prod(v)) + 1e-6)
