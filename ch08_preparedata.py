@@ -1,17 +1,19 @@
 """Splits the hand dataset into train and test folders."""
 
-import os, shutil
+import glob, os, shutil
+
+import dsift
 
 s = '/Users/thakis/Downloads/Marcel-Test'
 d = 'out_hands'
 
+# Symlink images to train/ and test/ folders.
 # Intentionally ignore the MiniTrieschGallery folder.
 ls = ['A', 'B', 'C', 'Five', 'Point', 'V']
 train = []
 test = []
 for l in ls:
-  imgdir = os.path.join(s, l, 'uniform')
-  imgs = [os.path.join(imgdir, f) for f in os.listdir(imgdir)]
+  imgs = glob.glob(os.path.join(s, l, 'uniform', '*'))
   train += imgs[::2]
   test += imgs[1::2]
 
@@ -25,3 +27,9 @@ md(os.path.join(d, 'test'))
 
 for p in train: os.symlink(p, os.path.join(d, 'train', os.path.basename(p)))
 for p in test: os.symlink(p, os.path.join(d, 'test', os.path.basename(p)))
+
+# Compute dsift descriptors.
+imlist = glob.glob(d + '/*/*.ppm')
+dsiftlist = [os.path.splitext(im)[0] + '.dsift' for im in imlist]
+for im, dim in zip(imlist, dsiftlist):
+  dsift.process_image_dsift(im, dim, 10, 5, resize=(50, 50))
