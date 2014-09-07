@@ -31,5 +31,13 @@ for p in test: os.symlink(p, os.path.join(d, 'test', os.path.basename(p)))
 # Compute dsift descriptors.
 imlist = glob.glob(d + '/*/*.ppm')
 dsiftlist = [os.path.splitext(im)[0] + '.dsift' for im in imlist]
-for im, dim in zip(imlist, dsiftlist):
-  dsift.process_image_dsift(im, dim, 10, 5, resize=(50, 50))
+# About 10s:
+#for im, dim in zip(imlist, dsiftlist):
+#  dsift.process_image_dsift(im, dim, 10, 5, resize=(50, 50))
+# About 7s:
+from multiprocessing.dummy import Pool as ThreadPool
+pool = ThreadPool(8)
+pool.map(lambda x: dsift.process_image_dsift(x[0], x[1], 10, 5, resize=(50,50)),
+         zip(imlist, dsiftlist))
+pool.close()
+pool.join()

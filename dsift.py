@@ -1,7 +1,8 @@
 import numpy
 import os
+import tempfile
+import shutil
 from PIL import Image
-import sift
 import scipy.io as sio
 
 def process_image_dsift(imname, resultname, size=20, steps=10,
@@ -15,23 +16,29 @@ def process_image_dsift(imname, resultname, size=20, steps=10,
     im = im.resize(resize)
   m, n = im.size
 
-  if not imname.endswith('pgm'):
-    im.save('out_tmp.pgm')
-    imname = 'out_tmp.pgm'
+  temp_dir = tempfile.mkdtemp()
+  try:
+    if not imname.endswith('pgm'):
+      tmpname = os.path.join(temp_dir, 'out_tmp.pgm')
+      im.save(tmpname)
+      imname = tmpname
 
-  scale = size / 3.0
-  x, y = numpy.meshgrid(range(steps, m, steps), range(steps, n, steps))
-  xx, yy = x.flatten(), y.flatten()
-  frame = numpy.array([xx, yy, scale * numpy.ones(xx.shape[0]),
-                               numpy.zeros(xx.shape[0])])
-  numpy.savetxt('out_tmp.frame', frame.T, fmt='%03.3f')
+    scale = size / 3.0
+    x, y = numpy.meshgrid(range(steps, m, steps), range(steps, n, steps))
+    xx, yy = x.flatten(), y.flatten()
+    tmpframe = os.path.join(temp_dir, 'out_tmp.frame')
+    frame = numpy.array([xx, yy, scale * numpy.ones(xx.shape[0]),
+                                 numpy.zeros(xx.shape[0])])
+    numpy.savetxt(tmpframe, frame.T, fmt='%03.3f')
 
-  cmd = ['sift', imname, '--output=' + resultname,
-         '--read-frames=out_tmp.frame']
-  if force_orientation:
-    cmd += ['--orientations']
-  os.system(' '.join(cmd))
+    cmd = ['sift', imname, '--output=' + resultname,
+           '--read-frames=' + tmpframe]
+    if force_orientation:
+      cmd += ['--orientations']
+    os.system(' '.join(cmd))
 
-  # Re-write as .mat file, which loads faster.
-  f = numpy.loadtxt(resultname)
-  sio.savemat(resultname + '.mat', {'f':f}, oned_as='row')
+    # Re-write as .mat file, which loads faster.
+    f = numpy.loadtxt(resultname)
+    sio.savemat(resultname + '.mat', {'f':f}, oned_as='row')
+  finally:
+    shutil.rmtree(temp_dir)
