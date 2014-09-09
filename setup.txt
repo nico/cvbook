@@ -56,3 +56,15 @@ CherryPy:
 Hit "Download" on http://www.cherrypy.org/ , get zip, cd there, do
 
   sudo python setup.py install
+
+LibSVN:
+
+Download zip from http://www.csie.ntu.edu.tw/~cjlin/libsvm/ , unzip, cd there,
+
+    make
+    cd python && make
+    cd ..
+    sudo mkdir /Library/Python/2.7/site-packages/libsvm
+    sudo touch /Library/Python/2.7/site-packages/libsvm/__init__.py
+    sudo cp libsvm.so.2 python/svm.py python/svmutil.py /Library/Python/2.7/site-packages/libsvm
+    sudo sed -i -e 's:\.\./::' /Library/Python/2.7/site-packages/libsvm/svm.py
