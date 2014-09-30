@@ -20,7 +20,7 @@ class BayesClassifier(object):
 
   def classify(self, points):
     """Classify points by computing probabilities for each class and returning
-    the most probably label."""
+    the most probable label."""
     est_prob = numpy.array([gauss(m, v, points)
                             for m, v in zip(self.mean, self.var)])
     ndx = est_prob.argmax(axis=0)
