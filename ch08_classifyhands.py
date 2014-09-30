@@ -2,6 +2,8 @@ import glob
 import os
 import numpy
 
+from libsvm import svmutil
+
 import bayes
 import knn
 import pca
@@ -63,3 +65,26 @@ print_confusion(res, test_labels, classnames)
 # FIXME: Bayes accuracy gets very bad if the input dimensions aren't reduced
 # enough. Probably some float underflow due to things not using log
 # probabilities?
+
+
+# Test SVM.
+features = map(list, features)
+test_features = map(list, test_features)
+
+str_int_map = {}  # libSVM needs int labels.
+for i, c in enumerate(classnames):
+  str_int_map[c], str_int_map[i] = i, c
+
+def convert_labels(labels, str_int_map):
+  return [str_int_map[l] for l in labels]
+
+problem = svmutil.svm_problem(convert_labels(labels, str_int_map), features)
+# Use a linear kernel, radial basis functions have horrible results (~20% acc)
+param = svmutil.svm_parameter('-q -t 0')
+model = svmutil.svm_train(problem, param)
+res = svmutil.svm_predict(
+    convert_labels(test_labels, str_int_map), test_features, model)[0]
+res = convert_labels(res, str_int_map)
+acc = numpy.sum(1.0 * (res == test_labels)) / len(test_labels)
+print 'SVM Accuracy:', acc
+print_confusion(res, test_labels, classnames)
