@@ -4,6 +4,7 @@ from pylab import *
 from scipy import ndimage
 
 import homography
+import imtools
 import tic
 
 
@@ -20,20 +21,18 @@ gray()
 x = ginput(4)
 
 # top left, top right, bottom right, bottom left
-fp = array([array([p[1], p[0], 1]) for p in x]).T
-tp = array([[0, 0, 1], [0, 1000, 1], [1000, 1000, 1], [1000, 0, 1]]).T
+# Note: The book switches fp from (x, y) order in |x| to (y, x) order in
+# fp. imtools.Htransform() expects (x, y) order, so don't do this switching
+# here.
+fp = array([array([p[0], p[1], 1]) for p in x]).T
+tp = array([[0, 0, 1], [1000, 0, 1], [1000, 1000, 1], [0, 1000, 1]]).T
 H = homography.H_from_points(tp, fp)
 
-def warpfcn(x):
-  x = array([x[0], x[1], 1])
-  xt = dot(H, x)
-  xt = xt / xt[2]
-  return xt[0], xt[1]
-
 tic.k('starting warp')
-im_g = ndimage.geometric_transform(im, warpfcn, (1000, 1000))
+im_g = imtools.Htransform(im, H, (1000, 1000))
 tic.k('warped')
 
 figure()
 imshow(im_g)
+gray()
 show()
